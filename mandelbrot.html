@@ -13,12 +13,28 @@
         #canvas {
             background: Transparent;
         }
+        
+        #canvas-wrapper {
+            padding-right:1rem;
+            display:inline-block;
+            vertical-align: top;
+        }
+        #status {
+            padding-left:1rem;
+            background: White;
+            display:inline-block;
+            vertical-align: top;
+            width: 500px;
+        }
 
     </style>
 </head>
 
 <body>
-    <canvas id="canvas" width="800" height="600"></canvas>
+    <div id="canvas-wrapper">
+        <canvas id="canvas" width="800" height="600"></canvas>
+    </div>
+    <div id="status"></div>
     <script type="text/javascript">
         //black is used if the pixel is ~approximately~ in the set.
         var _black = {
@@ -51,53 +67,93 @@
             });
         }
 
+        var _status = document.getElementById('status');
         var _canvas = document.getElementById('canvas');
         var _context = _canvas.getContext('2d');
 
         var _imageData = _context.createImageData(_canvas.width, _canvas.height);
         var _data = _imageData.data;
 
-        //set the max number of iterations for checking if
-        //the pixel approximates a value in the set
-        var maxIterations = 1000;
+        var _scale = 1; // the current rendering scale
+        var _zoomFactor = 1; // the factor by which to zoom
+        var _center = {
+            x: 0,
+            y: 0
+        }; //the current center of the image
+        var _maxIterations = 1000;
+        //zoom and displacement
+        function renderScene(zoom, dx, dy) {
+            var zoom = zoom || 1;
+            var dx = dx || 0;
+            var dy = dy || 0;
 
-        //An implementation of the Escape Time Algorithm
-        //https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
-        for (var py = 0; py < _imageData.height; py++) {
-            for (var px = 0; px < _imageData.width; px++) {
-                //the canvas pixel data is a bit awkward to get at...
-                //see: https://www.w3.org/TR/2dcontext/#pixel-manipulation
-                var dataIndex = (py * _imageData.width + px) * 4;
+            //set the max number of iterations for checking if
+            //the pixel approximates a value in the set
 
-                //scale the pixel values to be within the bounds of the set
-                //TODO: adjust scaling to make things less warped looking
-                var x0 = px * (3.5 / 800) - 2.5;
-                var y0 = py * (2.0 / 600) - 1;
 
-                var x = 0.0;
-                var y = 0.0;
+            //An implementation of the Escape Time Algorithm
+            //https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
+            for (var py = 0; py < _imageData.height; py++) {
+                for (var px = 0; px < _imageData.width; px++) {
+                    //the canvas pixel data is a bit awkward to get at...
+                    //see: https://www.w3.org/TR/2dcontext/#pixel-manipulation
+                    var dataIndex = (py * _imageData.width + px) * 4;
 
-                var iteration = 0;
-                while (x * x + y * y < 2 * 2 && iteration < maxIterations) {
-                    var tempX = x * x - y * y + x0;
-                    y = 2 * x * y + y0;
-                    x = tempX;
-                    iteration++;
+                    //scale the pixel values to frame the bounds of the set
+                    var x0 = (px + _center.x + (dx / zoom)) * ((3.5 / zoom) / 800) - (2.5 / zoom);
+                    var y0 = (py + _center.y + (dy / zoom)) * ((2.625 / zoom) / 600) - (1.3125 / zoom);
+
+                    var x = 0.0;
+                    var y = 0.0;
+
+                    var iteration = 0;
+                    while (x * x + y * y < 2 * 2 && iteration < _maxIterations) {
+                        var tempX = x * x - y * y + x0;
+                        y = 2 * x * y + y0;
+                        x = tempX;
+                        iteration++;
+                    }
+
+                    //if we've maxed out our iterations, it's a close
+                    //enough approximation, so color it black
+                    var color = iteration === _maxIterations ? _black : _palette[iteration % _palette.length];
+
+                    _data[dataIndex] = color.r;
+                    _data[dataIndex + 1] = color.g;
+                    _data[dataIndex + 2] = color.b;
+                    _data[dataIndex + 3] = 255;
                 }
-
-                //if we've maxed out our iterations, it's a close
-                //enough approximation, so color it black
-                var color = iteration === maxIterations ? _black : _palette[iteration % _palette.length];
-
-                _data[dataIndex] = color.r;
-                _data[dataIndex + 1] = color.g;
-                _data[dataIndex + 2] = color.b;
-                _data[dataIndex + 3] = 255;
             }
+            //draw it!
+            _context.putImageData(_imageData, 0, 0);
+            writeStatus();
         }
 
-        //draw it!
-        _context.putImageData(_imageData, 0, 0);
+        renderScene(1, 0, 0);
+
+        _canvas.addEventListener('click', function(e) {
+            _scale += 1;
+
+            var x = e.layerX;
+            var y = e.layerY;
+
+            renderScene(_scale, x, y);
+        });
+
+        function writeStatus() {
+            var zoomText = document.createElement('div');
+            zoomText.textContent = 'Zoom: ' + _scale;
+            var xText = document.createElement('div');
+            xText.textContent = 'X: ' + _center.x;
+            var yText = document.createElement('div');
+            yText.textContent = 'Y: ' + _center.y;
+            
+            _status.innerHTML = '';
+            
+            _status.appendChild(zoomText);
+            _status.appendChild(xText);
+            _status.appendChild(yText);
+        }
 
     </script>
 </body>
