@@ -9,11 +9,11 @@
         body {
             background: Black;
         }
-        
+
         #canvas {
             background: Transparent;
         }
-        
+
         #canvas-wrapper {
             padding-right:1rem;
             display:inline-block;
@@ -24,9 +24,8 @@
             background: White;
             display:inline-block;
             vertical-align: top;
-            width: 500px;
+            width: 200px;
         }
-
     </style>
 </head>
 
@@ -74,18 +73,17 @@
         var _imageData = _context.createImageData(_canvas.width, _canvas.height);
         var _data = _imageData.data;
 
-        var _scale = 1; // the current rendering scale
-        var _zoomFactor = 1; // the factor by which to zoom
-        var _center = {
+        var _viewData = {
+            scale: 2,
             x: 0,
             y: 0
         }; //the current center of the image
         var _maxIterations = 1000;
         //zoom and displacement
         function renderScene(zoom, dx, dy) {
-            var zoom = zoom || 1;
-            var dx = dx || 0;
-            var dy = dy || 0;
+            var zoom = zoom || _viewData.scale;
+            var dx = dx || _viewData.x/zoom;
+            var dy = dy || _viewData.y/zoom;
 
             //set the max number of iterations for checking if
             //the pixel approximates a value in the set
@@ -100,8 +98,8 @@
                     var dataIndex = (py * _imageData.width + px) * 4;
 
                     //scale the pixel values to frame the bounds of the set
-                    var x0 = (px + _center.x + (dx / zoom)) * ((3.5 / zoom) / 800) - (2.5 / zoom);
-                    var y0 = (py + _center.y + (dy / zoom)) * ((2.625 / zoom) / 600) - (1.3125 / zoom);
+                    var x0 = px * (((3.5 + dx) / zoom) / 800) - ((2.5 + dx) / zoom);
+                    var y0 = py * (((2.625 + dy) / zoom) / 600) - ((1.3125 + dy) / zoom);
 
                     var x = 0.0;
                     var y = 0.0;
@@ -126,34 +124,72 @@
             }
             //draw it!
             _context.putImageData(_imageData, 0, 0);
-            writeStatus();
+            //writeStatus();
         }
 
-        renderScene(1, 0, 0);
+        renderScene(2);
 
         _canvas.addEventListener('click', function(e) {
-            _scale += 1;
 
-            var x = e.layerX;
-            var y = e.layerY;
+            //need to translate clicked (x, y) to viewframe's (x, y)
+            var scale = _viewData.scale;
+            var px = e.layerX;
+            var py = e.layerY;
 
-            renderScene(_scale, x, y);
-        });
+            var dx = _viewData.x;
+            var dy = _viewData.y;
+            
+            
 
-        function writeStatus() {
+            //scale the pixel values to frame the bounds of the set
+            var x0 = px * (((3.5 + dx) / scale) / 800) - ((2.5 + dx) / scale);
+            var y0 = py * (((2.625 + dy) / scale) / 600) - ((1.3125 + dy) / scale);
+            
+            console.log('dx: ' + dx);
+            console.log('dy: ' + dy);
+            console.log('x0: ' + x0);
+            console.log('y0: ' + y0);
+
+            //_viewData.scale *= 2;
+            //_viewData.x = x0;
+            //_viewData.y = y0;
+            
+            //renderScene();
+            
             var zoomText = document.createElement('div');
-            zoomText.textContent = 'Zoom: ' + _scale;
+            zoomText.textContent = 'Scale: ' + _viewData.scale;
             var xText = document.createElement('div');
-            xText.textContent = 'X: ' + _center.x;
+            xText.textContent = 'x0: ' + x0.toString();
             var yText = document.createElement('div');
-            yText.textContent = 'Y: ' + _center.y;
-            
+            yText.textContent = 'y0: ' + y0;
+            var pxText = document.createElement('div');
+            pxText.textContent = 'px: ' + px;
+            var pyText = document.createElement('div');
+            pyText.textContent = 'py: ' + py;
+
             _status.innerHTML = '';
-            
+
             _status.appendChild(zoomText);
             _status.appendChild(xText);
             _status.appendChild(yText);
-        }
+            _status.appendChild(pxText);
+            _status.appendChild(pyText);
+        });
+
+        /*function writeStatus() {
+            var zoomText = document.createElement('div');
+            zoomText.textContent = 'Scale: ' + _viewData.scale;
+            var xText = document.createElement('div');
+            xText.textContent = 'x: ' + _viewData.x;
+            var yText = document.createElement('div');
+            yText.textContent = 'y: ' + _viewData.y;
+
+            _status.innerHTML = '';
+
+            _status.appendChild(zoomText);
+            _status.appendChild(xText);
+            _status.appendChild(yText);
+        }*/
 
     </script>
 </body>
