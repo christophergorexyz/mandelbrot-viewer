@@ -169,18 +169,12 @@
             xText.textContent = 'x0: ' + x0.toString();
             var yText = document.createElement('div');
             yText.textContent = 'y0: ' + y0;
-            var pxText = document.createElement('div');
-            pxText.textContent = 'px: ' + px;
-            var pyText = document.createElement('div');
-            pyText.textContent = 'py: ' + py;
 
             _status.innerHTML = '';
 
             _status.appendChild(zoomText);
             _status.appendChild(xText);
             _status.appendChild(yText);
-            _status.appendChild(pxText);
-            _status.appendChild(pyText);
         });
 
         /*function writeStatus() {
