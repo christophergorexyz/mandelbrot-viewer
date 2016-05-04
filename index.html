@@ -6,12 +6,21 @@
     <meta name="viewport" content="width=device-width">
     <title>Mandelbrot</title>
     <style>
-        body {
-            background: Black;
+        html,body{
+            height:100%;
+            width:100%;
+            margin:0;
+            padding:0;
+        }
+        html{
+            margin:0;
+            padding:0;
         }
 
         #canvas {
             background: Transparent;
+            width:100%;
+            height:100%;
         }
 
         #canvas-wrapper {
@@ -21,11 +30,14 @@
         }
 
         #status {
-            padding-left: 1rem;
+            position:absolute;
+            padding: 1rem;
             background: White;
-            display: inline-block;
-            vertical-align: top;
             width: 200px;
+        }
+
+        #controls{
+            position:absolute;
         }
 
     </style>
@@ -33,9 +45,12 @@
 
 <body>
     <div id="canvas-wrapper">
-        <canvas id="canvas" width="800" height="600"></canvas>
+        <canvas id="canvas"></canvas>
     </div>
     <div id="status"></div>
+    <div id="controls">
+        <button id="export-to-png">Export to PNG</button>
+    </div>
     <script type="text/javascript">
         //black is used if the pixel is ~approximately~ in the set.
         var _black = {
@@ -113,7 +128,7 @@
 
                     //scale the pixel values to frame the bounds of the set
                     var x0 = pMin + xStep * px;
-                    var y0 = qMax - yStep * py;
+                    var y0 = qMin + yStep * py;
 
                     var x = 0.0;
                     var y = 0.0;
@@ -150,12 +165,9 @@
             var px = e.layerX;
             var py = e.layerY;
 
-            var dx = _viewData.x;
-            var dy = _viewData.y;
-
             //scale the pixel values to frame the bounds of the set
             var x0 = pMin + xStep * px;
-            var y0 = qMax - yStep * py;
+            var y0 = qMin + yStep * py;
 
             _viewData.scale *= 2;
             _viewData.x = x0;
