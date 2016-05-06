@@ -6,50 +6,38 @@
     <meta name="viewport" content="width=device-width">
     <title>Mandelbrot</title>
     <style>
-        html,body{
-            height:100%;
-            width:100%;
-            margin:0;
-            padding:0;
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
         }
-        html{
-            margin:0;
-            padding:0;
-        }
-
+        
         #canvas {
-            background: Transparent;
-            width:100%;
-            height:100%;
+            background: transparent;
+            width: 100%;
+            height: 100%;
         }
-
-        #canvas-wrapper {
-            padding-right: 1rem;
-            display: inline-block;
-            vertical-align: top;
+        
+        #controls {
+            position: absolute;
+            top: 100px;
+            right: 100px;
         }
-
+        
         #status {
-            position:absolute;
             padding: 1rem;
             background: White;
-            width: 200px;
         }
-
-        #controls{
-            position:absolute;
-        }
-
     </style>
 </head>
 
 <body>
-    <div id="canvas-wrapper">
-        <canvas id="canvas"></canvas>
-    </div>
-    <div id="status"></div>
+    <canvas id="canvas"></canvas>
     <div id="controls">
         <button id="export-to-png">Export to PNG</button>
+        <div id="status"></div>
     </div>
     <script type="text/javascript">
         //black is used if the pixel is ~approximately~ in the set.
@@ -87,8 +75,8 @@
         var _canvas = document.getElementById('canvas');
         var _context = _canvas.getContext('2d');
 
-        var _imageData = _context.createImageData(_canvas.width, _canvas.height);
-        var _data = _imageData.data;
+        var _imageData;
+        var _data;
 
         var _viewData = {
             scale: 1,
@@ -103,6 +91,12 @@
         var qMax;
         var qMin;
 
+        var initLeftEdge = leftEdge = -2.5;
+        var initRightEdge = rightEdge = 1;
+        var initTopEdge = topEdge = -1;
+        var initBottomEdge = bottomEdge = 1;
+
+        var _mandelRatio = 3.5 / 2;
         var _maxIterations = 1000;
         //zoom and displacement
         function renderScene(zoom, dx, dy) {
@@ -110,13 +104,15 @@
             var dx = dx || _viewData.x;
             var dy = dy || _viewData.y;
 
+            pMax = rightEdge / zoom + dx;
+            pMin = leftEdge / zoom + dx;
+            qMax = bottomEdge / zoom + dy;
+            qMin = topEdge / zoom + dy;
+
             //concepts borrowed from: http://www.atopon.org/mandel/
-            xStep = 3.5/zoom/_canvas.width;
-            yStep = 2.625/zoom/_canvas.height;
-            pMax = 1/zoom + dx;
-            pMin = -2.5/zoom + dx;
-            qMax = 1.3125/zoom + dy;
-            qMin = -1.3125/zoom + dy;
+            xStep = (pMax - pMin) / _imageData.width;
+            yStep = (qMax - qMin) / _imageData.height;
+
 
             //An implementation of the Escape Time Algorithm
             //https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
@@ -156,9 +152,7 @@
             //writeStatus();
         }
 
-        renderScene();
-
-        _canvas.addEventListener('click', function(e) {
+        _canvas.addEventListener('click', function (e) {
 
             //need to translate clicked (x, y) to viewframe's (x, y)
             var scale = _viewData.scale;
@@ -189,21 +183,17 @@
             _status.appendChild(yText);
         });
 
-        /*function writeStatus() {
-            var zoomText = document.createElement('div');
-            zoomText.textContent = 'Scale: ' + _viewData.scale;
-            var xText = document.createElement('div');
-            xText.textContent = 'x: ' + _viewData.x;
-            var yText = document.createElement('div');
-            yText.textContent = 'y: ' + _viewData.y;
+        function _handleWindowResize() {
+            _canvas.width = window.innerWidth;
+            _canvas.height = window.innerHeight;
+            _imageData = _context.createImageData(_canvas.width, _canvas.height);
 
-            _status.innerHTML = '';
+            _data = _imageData.data;
+            renderScene();
+        }
 
-            _status.appendChild(zoomText);
-            _status.appendChild(xText);
-            _status.appendChild(yText);
-        }*/
-
+        window.onresize = _handleWindowResize;
+        _handleWindowResize();
     </script>
 </body>
 
