@@ -12,23 +12,20 @@
             width: 100%;
             margin: 0;
             padding: 0;
+            font-family: monospace;
         }
-        
         #canvas {
             background: transparent;
             width: 100%;
             height: 100%;
+            cursor: zoom-in;
         }
-        
         #controls {
             position: absolute;
+            background: White;
+            padding: 1rem;
             top: 100px;
             right: 100px;
-        }
-        
-        #status {
-            padding: 1rem;
-            background: White;
         }
     </style>
 </head>
@@ -36,8 +33,15 @@
 <body>
     <canvas id="canvas"></canvas>
     <div id="controls">
-        <button id="export-to-png">Export to PNG</button>
+        <div>
+            <a id="get-png" href="#" target="_blank">GET PNG</a>
+        </div>
+        <div>
+            <button onclick="zoomIn();">+</button>
+            <button onclick="zoomOut();">-</button>
+        </div>
         <div id="status"></div>
+
     </div>
     <script type="text/javascript">
         //black is used if the pixel is ~approximately~ in the set.
@@ -96,13 +100,31 @@
         var initTopEdge = topEdge = -1;
         var initBottomEdge = bottomEdge = 1;
 
-        var _mandelRatio = 3.5 / 2;
+        var _mandelRatio = (initRightEdge - initLeftEdge) / (initBottomEdge - initTopEdge);
+        var _imageRatio = _canvas.width / _canvas.height;
         var _maxIterations = 1000;
         //zoom and displacement
         function renderScene(zoom, dx, dy) {
             var zoom = zoom || _viewData.scale;
             var dx = dx || _viewData.x;
             var dy = dy || _viewData.y;
+
+            if (_imageRatio > _mandelRatio) {
+                var percentage = (_imageRatio / _mandelRatio);
+                var difference = (initRightEdge - initLeftEdge) * percentage;
+                leftEdge = -difference / (2 * (2.5 / 3.5));
+                rightEdge = difference / (2 * (3.5 / 2.5));
+                topEdge = initTopEdge;
+                bottomEdge = initBottomEdge;
+
+            } else if (_imageRatio < _mandelRatio) {
+                var percentage = (_mandelRatio / _imageRatio);
+                var difference = (initBottomEdge - initTopEdge) * percentage;
+                topEdge = -difference / 2;
+                bottomEdge = difference / 2;
+                leftEdge = initLeftEdge;
+                rightEdge = initRightEdge;
+            }
 
             pMax = rightEdge / zoom + dx;
             pMin = leftEdge / zoom + dx;
@@ -149,10 +171,11 @@
             }
             //draw it!
             _context.putImageData(_imageData, 0, 0);
-            //writeStatus();
+            _writeStatus();
+            document.getElementById('get-png').href = _canvas.toDataURL('image/png');
         }
 
-        _canvas.addEventListener('click', function (e) {
+        _canvas.addEventListener('click', function(e) {
 
             //need to translate clicked (x, y) to viewframe's (x, y)
             var scale = _viewData.scale;
@@ -168,19 +191,6 @@
             _viewData.y = y0;
 
             renderScene();
-
-            var zoomText = document.createElement('div');
-            zoomText.textContent = 'Scale: ' + _viewData.scale;
-            var xText = document.createElement('div');
-            xText.textContent = 'x0: ' + x0.toString();
-            var yText = document.createElement('div');
-            yText.textContent = 'y0: ' + y0;
-
-            _status.innerHTML = '';
-
-            _status.appendChild(zoomText);
-            _status.appendChild(xText);
-            _status.appendChild(yText);
         });
 
         function _handleWindowResize() {
@@ -188,12 +198,39 @@
             _canvas.height = window.innerHeight;
             _imageData = _context.createImageData(_canvas.width, _canvas.height);
 
+            _imageRatio = _imageData.width / _imageData.height;
             _data = _imageData.data;
             renderScene();
         }
 
+        function zoomIn() {
+            _viewData.scale *= 2;
+            renderScene();
+        }
+
+        function zoomOut() {
+            _viewData.scale /= 2;
+            renderScene();
+        }
+
+        function _writeStatus() {
+            var zoomText = document.createElement('div');
+            zoomText.textContent = 'Scale: ' + _viewData.scale;
+            var xText = document.createElement('div');
+            xText.textContent = 'x0: ' + _viewData.x;
+            var yText = document.createElement('div');
+            yText.textContent = 'y0: ' + _viewData.y;
+
+            _status.innerHTML = '';
+
+            _status.appendChild(zoomText);
+            _status.appendChild(xText);
+            _status.appendChild(yText);
+        }
+
         window.onresize = _handleWindowResize;
         _handleWindowResize();
+
     </script>
 </body>
 
