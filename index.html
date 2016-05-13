@@ -84,7 +84,7 @@
 
         var _viewData = {
             scale: 1,
-            x: 0,
+            x: -0.75,
             y: 0
         }; //the current center of the image
 
@@ -106,7 +106,7 @@
         //zoom and displacement
         function renderScene(zoom, dx, dy) {
             var zoom = zoom || _viewData.scale;
-            var dx = dx || _viewData.x;
+            var dx = dx || _viewData.x + 0.75/zoom;
             var dy = dy || _viewData.y;
 
             if (_imageRatio > _mandelRatio) {
