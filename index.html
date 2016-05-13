@@ -259,9 +259,14 @@
         }
 
         function save() {
-            _viewData.name = 'location ' + (savedLocations.length + 1);
-            savedLocations.push(_viewData);
+            var saveData = {};
+            saveData.name = 'location ' + (savedLocations.length + 1);
+            saveData.x = _viewData.x;
+            saveData.y = _viewData.y;
+            saveData.scale = _viewData.scale;
+            savedLocations.push(saveData);
             window.localStorage.setItem('locations', JSON.stringify(savedLocations));
+            updateSavedList();
         }
 
         function load(l) {
@@ -290,14 +295,20 @@
             load(location);
         }
 
+        function handleSavedLocationClick(e){
+            e.preventDefault();
+            var index = e.target.getAttribute('data-location-index');
+            var loc = savedLocations[index];
+            load(loc);
+        }
+
         function updateSavedList() {
+            _savedList.innerHTML = '';
             for (var l in savedLocations) {
                 var linkwrapper = document.createElement('div');
                 var anchor = document.createElement('a');
-                anchor.onclick = function(e) {
-                    e.preventDefault();
-                    load(savedLocations[l]);
-                };
+                anchor.onclick = handleSavedLocationClick;
+                anchor.setAttribute('data-location-index', l);
                 anchor.href = '#';
                 anchor.innerHTML = savedLocations[l].name;
                 linkwrapper.appendChild(anchor);
