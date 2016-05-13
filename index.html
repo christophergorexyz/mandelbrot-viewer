@@ -14,19 +14,26 @@
             padding: 0;
             font-family: monospace;
         }
+
         #canvas {
             background: transparent;
             width: 100%;
             height: 100%;
             cursor: zoom-in;
         }
+
         #controls {
             position: absolute;
             background: White;
             padding: 1rem;
-            top: 100px;
-            right: 100px;
+            left: 50px;
+            top: 50px;
         }
+
+        #set-location {
+            display: none;
+        }
+
     </style>
 </head>
 
@@ -39,9 +46,29 @@
         <div>
             <button onclick="zoomIn();">+</button>
             <button onclick="zoomOut();">-</button>
+            <button onclick="reset();">Reset</button>
         </div>
         <div id="status"></div>
-
+        <div>
+            <button onclick="save();">Save</button>
+            <button onclick="showSetLocation();">Set Location</button>
+        </div>
+        <div id="set-location">
+            <div>
+                <label for="scale">Scale</label>
+                <input id="scale" type="text" />
+            </div>
+            <div>
+                <label for="x-location">X</label>
+                <input id="x-location" type="text" />
+            </div>
+            <div>
+                <label for="y-location">Y</label>
+                <input id="y-location" type="text" />
+            </div>
+            <button onclick="setLocation();">go</button>
+        </div>
+        <div id="saved-list"></div>
     </div>
     <script type="text/javascript">
         //black is used if the pixel is ~approximately~ in the set.
@@ -77,16 +104,18 @@
 
         var _status = document.getElementById('status');
         var _canvas = document.getElementById('canvas');
+        var _savedList = document.getElementById('saved-list');
         var _context = _canvas.getContext('2d');
+
+        var savedData = window.localStorage.getItem('locations');
+        var savedLocations = [];
+        if (savedData) {
+            savedLocations = JSON.parse(savedData);
+            updateSavedList();
+        }
 
         var _imageData;
         var _data;
-
-        var _viewData = {
-            scale: 1,
-            x: -0.75,
-            y: 0
-        }; //the current center of the image
 
         var xStep;
         var yStep;
@@ -95,10 +124,19 @@
         var qMax;
         var qMin;
 
+        //The bounds of the mandelbrot set
         var initLeftEdge = leftEdge = -2.5;
         var initRightEdge = rightEdge = 1;
         var initTopEdge = topEdge = -1;
         var initBottomEdge = bottomEdge = 1;
+
+        var _horizontalOffset = initRightEdge - ((initRightEdge - initLeftEdge) / 2);
+
+        var _viewData = {
+            scale: 1,
+            x: _horizontalOffset,
+            y: 0
+        }; //the current center of the image
 
         var _mandelRatio = (initRightEdge - initLeftEdge) / (initBottomEdge - initTopEdge);
         var _imageRatio = _canvas.width / _canvas.height;
@@ -106,17 +144,19 @@
         //zoom and displacement
         function renderScene(zoom, dx, dy) {
             var zoom = zoom || _viewData.scale;
-            var dx = dx || _viewData.x + 0.75/zoom;
+            var dx = dx || _viewData.x - _horizontalOffset / zoom;
             var dy = dy || _viewData.y;
 
             if (_imageRatio > _mandelRatio) {
                 var percentage = (_imageRatio / _mandelRatio);
                 var difference = (initRightEdge - initLeftEdge) * percentage;
+
+                //TODO: this shouldn't work
                 leftEdge = -difference / (2 * (2.5 / 3.5));
                 rightEdge = difference / (2 * (3.5 / 2.5));
+
                 topEdge = initTopEdge;
                 bottomEdge = initBottomEdge;
-
             } else if (_imageRatio < _mandelRatio) {
                 var percentage = (_mandelRatio / _imageRatio);
                 var difference = (initBottomEdge - initTopEdge) * percentage;
@@ -211,6 +251,60 @@
         function zoomOut() {
             _viewData.scale /= 2;
             renderScene();
+        }
+
+        function reset() {
+            _viewData.scale = 1;
+            _viewData.x = -0.75;
+            _viewData.y = 0;
+            renderScene();
+        }
+
+        function save() {
+            _viewData.name = 'location ' + (savedLocations.length + 1);
+            savedLocations.push(_viewData);
+            window.localStorage.setItem('locations', JSON.stringify(savedLocations));
+        }
+
+        function load(l) {
+            _viewData.x = l.x;
+            _viewData.y = l.y;
+            _viewData.scale = l.scale;
+            renderScene();
+        }
+
+        function showSetLocation() {
+            document.getElementById('set-location').style.display = 'block';
+        }
+
+        function setLocation() {
+            var scaleElement = document.getElementById('scale');
+            var xElement = document.getElementById('x-location');
+            var yElement = document.getElementById('y-location');
+            var location = {};
+            location.scale = parseFloat(scaleElement.value);
+            location.x = parseFloat(xElement.value);
+            location.y = parseFloat(yElement.value);
+            scaleElement.value = '';
+            xElement.value = '';
+            yElement.value = '';
+            document.getElementById('set-location').style.display = 'none';
+            load(location);
+        }
+
+        function updateSavedList() {
+            for (var l in savedLocations) {
+                var linkwrapper = document.createElement('div');
+                var anchor = document.createElement('a');
+                anchor.onclick = function(e) {
+                    e.preventDefault();
+                    load(savedLocations[l]);
+                };
+                anchor.href = '#';
+                anchor.innerHTML = savedLocations[l].name;
+                linkwrapper.appendChild(anchor);
+                _savedList.appendChild(linkwrapper);
+            }
         }
 
         function _writeStatus() {
