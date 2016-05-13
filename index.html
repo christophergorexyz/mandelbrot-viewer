@@ -171,10 +171,8 @@
             qMax = bottomEdge / zoom + dy;
             qMin = topEdge / zoom + dy;
 
-            //concepts borrowed from: http://www.atopon.org/mandel/
             xStep = (pMax - pMin) / _imageData.width;
             yStep = (qMax - qMin) / _imageData.height;
-
 
             //An implementation of the Escape Time Algorithm
             //https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
