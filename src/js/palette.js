@@ -1,9 +1,3 @@
-var _black = {
-    r: 0,
-    g: 0,
-    b: 0
-};
-
 /*
  * the following loop was
  * modified from rainbowify
@@ -29,7 +23,8 @@ for (var i = 0; i < (6 * 7); i++) {
 }
 
 
-module.exports = {
-    black: _black,
-    rainbow: _rainbow
-};
+exports.rainbow = _rainbow;
+
+//TODO:
+// 1. create additional predefined palettes
+// 2. develop interface for saving/loading user-defined palettes to local storage
