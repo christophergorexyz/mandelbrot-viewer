@@ -1,3 +1,5 @@
+import palette from './palette';
+
 //the bounds of the set
 const LEFT_EDGE = -2.5;
 const RIGHT_EDGE = 1;
@@ -22,19 +24,18 @@ const DEFAULT_SETTINGS = {
     }
 };
 
-class Renderer {
+export default class Renderer {
     constructor(canvas, options) {
         this._canvas = canvas;
         this._context = this._canvas.getContext('2d');
         this._imageData = this._context.createImageData(this._canvas.width, this._canvas.height);
         this._data = this._imageData.data;
 
-
         this._maxIterations = options.maxIterations || DEFAULT_SETTINGS.maxIterations;
         this._mandelbrotColor = options.mandelbrotColor || DEFAULT_SETTINGS.mandelbrotColor;
-        this._palette = require('palette')[options.palette || DEFAULT_SETTINGS.palette];
+        this._palette = palette[options.palette || DEFAULT_SETTINGS.palette];
 
-        //TODO: decide if this is beset approach
+        //TODO: decide if this is beset approach.
         //is it better to let user be absolute in this?
         //or to enforce perfect cycle of palette?
         this._maxIterations = this._maxIterations + (this._maxIterations % this._palette.length);
@@ -160,5 +161,3 @@ class Renderer {
         this._context.putImageData(this._imageData, 0, 0);
     }
 }
-
-module.exports = Renderer;
