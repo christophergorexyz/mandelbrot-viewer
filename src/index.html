@@ -14,13 +14,13 @@
             padding: 0;
             font-family: monospace;
         }
-
+        
         #canvas {
             background: transparent;
             width: 100%;
             height: 100%;
         }
-
+        
         #controls {
             position: absolute;
             background: White;
@@ -28,7 +28,7 @@
             left: 50px;
             top: 50px;
         }
-
+        
         #set-location {
             display: none;
         }
@@ -36,7 +36,7 @@
 </head>
 
 <body>
-    <canvas id="canvas"></canvas>
+    <canvas id="mandelbrot"></canvas>
     <div id="controls">
         <div>
             <a id="get-png" href="#" target="_blank">GET PNG</a>
@@ -69,6 +69,100 @@
         <div id="saved-list"></div>
     </div>
     <script src="mandelbrot.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var Renderer = require('mandelbrot').Renderer;
+        var _canvas = document.getElementById('mandelbrot');
+        var _r = new Renderer(_canvas);
+
+        var _viewData = {
+            scale: 1,
+            x: _r.x,
+            y: _r.y
+
+        }
+
+        function _handleWindowResize() {
+            _canvas.width = window.innerWidth;
+            _canvas.height = window.innerHeight;
+            _r.updateViewportSize();
+            _r.render();
+        }
+
+        function zoomIn() {
+            _viewData.scale *= 2;
+            renderScene();
+        }
+
+        function zoomOut() {
+            _viewData.scale /= 2;
+            renderScene();
+        }
+
+        function reset() {
+            _viewData.scale = 1;
+            _viewData.x = -0.75;
+            _viewData.y = 0;
+            renderScene();
+        }
+
+        function save() {
+            var saveData = {};
+            saveData.name = 'location ' + (savedLocations.length + 1);
+            saveData.x = _viewData.x;
+            saveData.y = _viewData.y;
+            saveData.scale = _viewData.scale;
+            savedLocations.push(saveData);
+            window.localStorage.setItem('locations', JSON.stringify(savedLocations));
+            updateSavedList();
+        }
+
+        function load(l) {
+            _viewData.x = l.x;
+            _viewData.y = l.y;
+            _viewData.scale = l.scale;
+            renderScene();
+        }
+
+        function showSetLocation() {
+            document.getElementById('set-location').style.display = 'block';
+        }
+
+        function setLocation() {
+            var scaleElement = document.getElementById('scale');
+            var xElement = document.getElementById('x-location');
+            var yElement = document.getElementById('y-location');
+            var location = {};
+            location.scale = parseFloat(scaleElement.value);
+            location.x = parseFloat(xElement.value);
+            location.y = parseFloat(yElement.value);
+            scaleElement.value = '';
+            xElement.value = '';
+            yElement.value = '';
+            document.getElementById('set-location').style.display = 'none';
+            load(location);
+        }
+
+        function handleSavedLocationClick(e) {
+            e.preventDefault();
+            var index = e.target.getAttribute('data-location-index');
+            var loc = savedLocations[index];
+            load(loc);
+        }
+
+        function updateSavedList() {
+            _savedList.innerHTML = '';
+            for (var l in savedLocations) {
+                var linkwrapper = document.createElement('div');
+                var anchor = document.createElement('a');
+                anchor.onclick = handleSavedLocationClick;
+                anchor.setAttribute('data-location-index', l);
+                anchor.href = '#';
+                anchor.innerHTML = savedLocations[l].name;
+                linkwrapper.appendChild(anchor);
+                _savedList.appendChild(linkwrapper);
+            }
+        }
+    </script>
 </body>
 
 </html>
