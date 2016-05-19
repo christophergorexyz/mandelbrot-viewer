@@ -1,6 +1,5 @@
 'use strict';
 let gulp = require('gulp'),
-    gulpUtil = require('gulp-util'),
     babelify = require('babelify'),
     browserify = require('browserify'),
     fs = require('fs'),
@@ -12,6 +11,7 @@ gulp.task('browserify', () => {
     mkdirp('dist/js');
     return browserify({
             entries: ['src/js/index'],
+            standalone: 'mandelbrot'
         }).transform(babelify, {
             presets: ['es2015']
         }).bundle()

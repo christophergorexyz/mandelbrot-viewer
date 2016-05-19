@@ -68,11 +68,11 @@
         </div>
         <div id="saved-list"></div>
     </div>
-    <script src="mandelbrot.js" type="text/javascript"></script>
+    <script src="js/index.js" type="text/javascript"></script>
     <script type="text/javascript">
-        var Renderer = require('mandelbrot').Renderer;
+        //var Renderer = require('mandelbrot').Renderer;
         var _canvas = document.getElementById('mandelbrot');
-        var _r = new Renderer(_canvas);
+        var _r = new mandelbrot.Renderer(_canvas);
 
         var _viewData = {
             scale: 1,
@@ -80,6 +80,8 @@
             y: _r.y
 
         }
+
+        _r.render(1, 0, -0.75);
 
         function _handleWindowResize() {
             _canvas.width = window.innerWidth;

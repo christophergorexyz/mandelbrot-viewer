@@ -23,7 +23,9 @@ for (var i = 0; i < (6 * 7); i++) {
 }
 
 
-export default _rainbow;
+export default {
+    rainbow: _rainbow
+};
 
 //TODO:
 // 1. create additional predefined palettes

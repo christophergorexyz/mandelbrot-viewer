@@ -1,5 +1,7 @@
 import palette from './palette';
 
+import assign from 'lodash.assign';
+
 //the bounds of the set
 const LEFT_EDGE = -2.5;
 const RIGHT_EDGE = 1;
@@ -26,14 +28,17 @@ const DEFAULT_SETTINGS = {
 
 export default class Renderer {
     constructor(canvas, options) {
+
+        options = assign({}, options, DEFAULT_SETTINGS);
+
         this._canvas = canvas;
         this._context = this._canvas.getContext('2d');
         this._imageData = this._context.createImageData(this._canvas.width, this._canvas.height);
         this._data = this._imageData.data;
 
-        this._maxIterations = options.maxIterations || DEFAULT_SETTINGS.maxIterations;
-        this._mandelbrotColor = options.mandelbrotColor || DEFAULT_SETTINGS.mandelbrotColor;
-        this._palette = palette[options.palette || DEFAULT_SETTINGS.palette];
+        this._maxIterations = options.maxIterations;
+        this._mandelbrotColor = options.mandelbrotColor;
+        this._palette = palette[options.palette];
 
         //TODO: decide if this is beset approach.
         //is it better to let user be absolute in this?
@@ -152,7 +157,7 @@ export default class Renderer {
 
                 //if we've maxed out our iterations, it's a close
                 //enough approximation, so color it black
-                var color = iteration === this._maxIterations ? this._mandelbrotColor : this._palette.rainbow[iteration % this._palette.length];
+                var color = iteration === this._maxIterations ? this._mandelbrotColor : this._palette[iteration % this._palette.length];
 
                 this.plot(canvasX, canvasY, color);
             }

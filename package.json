@@ -27,7 +27,9 @@
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "gulp": "^3.9.1",
-    "gulp-util": "^3.0.7",
     "mkdirp": "^0.5.1"
+  },
+  "dependencies": {
+    "lodash.assign": "^4.0.9"
   }
 }
