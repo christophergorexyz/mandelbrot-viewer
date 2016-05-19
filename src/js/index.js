@@ -1,2 +1,4 @@
 import Renderer from './renderer';
-console.log(Renderer);
+import Palette from './palette';
+export { Renderer };
+export { Palette } ;
