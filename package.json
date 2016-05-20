@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "predev": "npm install",
-    "dev": "gulp"
+    "dev": "gulp | rainbowify"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,8 @@
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "gulp": "^3.9.1",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "rainbowify": "^1.0.1"
   },
   "dependencies": {
     "lodash.assign": "^4.0.9"

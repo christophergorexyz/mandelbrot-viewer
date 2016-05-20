@@ -18,7 +18,7 @@ const MIMETYPE_PNG = 'image/png';
 
 const DEFAULT_SETTINGS = {
     palette: 'rainbow',
-    maxIterations: 1000, //probably better NOT to set this in the options
+    maxIterations: 1000, //probably better NOT to set this in the options?
     mandelbrotColor: {
         r: 0,
         g: 0,
@@ -52,38 +52,6 @@ export default class Renderer {
         this._dy = 0;
     }
 
-    updateViewportSize() {
-        //width / height ratio of the viewport
-        this._imageRatio = this._imageData.width / this._imageData.height;
-
-        var ratio = 1;
-        var product = 0;
-
-        //modify the bounds we display based on the
-        //difference between the viewport ratio and
-        //the ratio of the bounds of the mandelbrot
-        if (this._imageRatio > MANDEL_RATIO) {
-            ratio = (this._imageRatio / MANDEL_RATIO);
-            product = (RIGHT_EDGE - LEFT_EDGE) * ratio;
-
-            //TODO: this shouldn't work, magic numbers, etc
-            this._leftEdge = -product / (2 * (2.5 / 3.5));
-            this._rightEdge = product / (2 * (3.5 / 2.5));
-
-            this._topEdge = TOP_EDGE;
-            this._bottomEdge = BOTTOM_EDGE;
-        } else {
-            ratio = (MANDEL_RATIO / this._imageRatio);
-            product = (BOTTOM_EDGE - TOP_EDGE) * ratio;
-
-            this._topEdge = -product / 2;
-            this._bottomEdge = product / 2;
-
-            this._leftEdge = LEFT_EDGE;
-            this._rightEdge = RIGHT_EDGE;
-        }
-    }
-
     get DataUrl() {
         return this._canvas.toDataURL(MIMETYPE_PNG);
     }
@@ -108,6 +76,40 @@ export default class Renderer {
         this._data[dataIndex + 3] = 255; //max saturation
     }
 
+    updateViewportSize() {
+        //width / height ratio of the viewport
+        this._imageData = this._context.createImageData(this._canvas.width, this._canvas.height);
+        this._data = this._imageData.data;
+        this._imageRatio = this._imageData.width / this._imageData.height;
+
+        var ratio = 1;
+        var product = 0;
+
+        this._topEdge = TOP_EDGE;
+        this._bottomEdge = BOTTOM_EDGE;
+        this._leftEdge = LEFT_EDGE;
+        this._rightEdge = RIGHT_EDGE;
+
+        //modify the bounds we display based on the
+        //difference between the viewport ratio and
+        //the ratio of the bounds of the mandelbrot
+        if (this._imageRatio > MANDEL_RATIO) {
+            ratio = (this._imageRatio / MANDEL_RATIO);
+            product = (RIGHT_EDGE - LEFT_EDGE) * ratio;
+
+            //TODO: this shouldn't work, magic numbers, etc
+            this._leftEdge = -product / (2 * (2.5 / 3.5));
+            this._rightEdge = product / (2 * (3.5 / 2.5));
+        } else {
+            ratio = (MANDEL_RATIO / this._imageRatio);
+            product = (BOTTOM_EDGE - TOP_EDGE) * ratio;
+
+            this._topEdge = -product / 2;
+            this._bottomEdge = product / 2;
+        }
+    }
+
+
     //scale: how far we've zoomed in from the default
     //dx0: displacement of perspective horizontally
     //dy0: displacement of perspective vertically
@@ -116,16 +118,11 @@ export default class Renderer {
         this._dx = dx0 - HORIZONTAL_OFFSET / this._scale;
         this._dy = dy0;
 
-        var leftEdge = LEFT_EDGE;
-        var rightEdge = RIGHT_EDGE;
-        var topEdge = TOP_EDGE;
-        var bottomEdge = BOTTOM_EDGE;
-
         //the Real (ℝ) boundaries of the rendering given the zoom and offset
-        var xMax = rightEdge / this._scale + this._dx;
-        var xMin = leftEdge / this._scale + this._dx;
-        var yMax = bottomEdge / this._scale + this._dy;
-        var yMin = topEdge / this._scale + this._dy;
+        var xMax = this._rightEdge / this._scale + this._dx;
+        var xMin = this._leftEdge / this._scale + this._dx;
+        var yMax = this._bottomEdge / this._scale + this._dy;
+        var yMin = this._topEdge / this._scale + this._dy;
 
         //translation of "Pixel space" to Real (ℝ) space
         //i.e., these variables represent the Real difference
