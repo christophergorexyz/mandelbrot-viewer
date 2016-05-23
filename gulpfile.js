@@ -11,10 +11,23 @@ gulp.task('browserify', () => {
     mkdirp('dist/js');
     return browserify({
             entries: ['src/js/index'],
-            standalone: 'mandelbrot'
-        }).transform(babelify, {
+            standalone: 'mandelbrot',
+            debug: true
+        })
+        .transform(babelify, {
             presets: ['es2015']
-        }).bundle()
+        })
+        .bundle()
+        .on('error', function (err) {
+            console.log();
+            console.log("Error: " + err.message);
+
+            console.log("\tFile: " + err.filename);
+            console.log("\tLine: " + err.loc.line);
+            console.log("\tColumn: " + err.loc.column);
+            console.log(err.codeFrame);
+            this.emit('end');
+        })
         .pipe(fs.createWriteStream(path.join(__dirname, 'dist/js', 'index.js'), {
             encoding: 'utf-8'
         }));

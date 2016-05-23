@@ -9,7 +9,7 @@ const TOP_EDGE = -1;
 const BOTTOM_EDGE = 1;
 
 //because the bounds of the set are uneven, we're horizontally offset this much
-const HORIZONTAL_OFFSET = LEFT_EDGE - ((RIGHT_EDGE - LEFT_EDGE) / 2);
+const HORIZONTAL_OFFSET = LEFT_EDGE - ((LEFT_EDGE - RIGHT_EDGE) / 2);
 
 //width / height ratio of the bounds of the set
 const MANDEL_RATIO = (RIGHT_EDGE - LEFT_EDGE) / (BOTTOM_EDGE - TOP_EDGE);
@@ -69,6 +69,8 @@ export default class Renderer {
     }
 
     plot(x, y, color) {
+        //the canvas pixel data is a bit awkward to get at...
+        //see: https://www.w3.org/TR/2dcontext/#pixel-manipulation
         var dataIndex = (y * this._imageData.width + x) * 4;
         this._data[dataIndex] = color.r;
         this._data[dataIndex + 1] = color.g;
@@ -97,49 +99,49 @@ export default class Renderer {
             ratio = (this._imageRatio / MANDEL_RATIO);
             product = (RIGHT_EDGE - LEFT_EDGE) * ratio;
 
-            //TODO: this shouldn't work, magic numbers, etc
-            this._leftEdge = -product / (2 * (2.5 / 3.5));
-            this._rightEdge = product / (2 * (3.5 / 2.5));
+            this._leftEdge = -product * (2.5 / 3.5);
+            this._rightEdge = product * (1 / 3.5);
         } else {
             ratio = (MANDEL_RATIO / this._imageRatio);
             product = (BOTTOM_EDGE - TOP_EDGE) * ratio;
 
-            this._topEdge = -product / 2;
-            this._bottomEdge = product / 2;
+            this._topEdge = -product * (1 / 2.0);
+            this._bottomEdge = product * (1 / 2.0);
         }
     }
 
+    updateRealBoundaries() {
+        //the Real (ℝ) boundaries of the rendering given the zoom and offset
+        this.xMax = this._rightEdge / this.scale + this.x;
+        this.xMin = this._leftEdge / this.scale + this.x;
+        this.yMax = this._bottomEdge / this.scale + this.y;
+        this.yMin = this._topEdge / this.scale + this.y;
+
+        //translation of "Pixel space" to Real (ℝ) space
+        //i.e., these variables represent the Real difference
+        //between two pixels, horizonatally and vertically
+        this.xStep = (this.xMax - this.xMin) / this._imageData.width;
+        this.yStep = (this.yMax - this.yMin) / this._imageData.height;
+    }
 
     //scale: how far we've zoomed in from the default
     //dx0: displacement of perspective horizontally
     //dy0: displacement of perspective vertically
     render(scale, dx0, dy0) {
         this._scale = scale;
-        this._dx = dx0 - HORIZONTAL_OFFSET / this._scale;
+        this._dx = dx0 - HORIZONTAL_OFFSET/this._scale;
         this._dy = dy0;
 
-        //the Real (ℝ) boundaries of the rendering given the zoom and offset
-        var xMax = this._rightEdge / this._scale + this._dx;
-        var xMin = this._leftEdge / this._scale + this._dx;
-        var yMax = this._bottomEdge / this._scale + this._dy;
-        var yMin = this._topEdge / this._scale + this._dy;
-
-        //translation of "Pixel space" to Real (ℝ) space
-        //i.e., these variables represent the Real difference
-        //between two pixels, horizonatally and vertically
-        var xStep = (xMax - xMin) / this._imageData.width;
-        var yStep = (yMax - yMin) / this._imageData.height;
+        this.updateRealBoundaries();
 
         //An implementation of the Escape Time Algorithm
         //https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
         for (var canvasY = 0; canvasY < this._imageData.height; canvasY++) {
             for (var canvasX = 0; canvasX < this._imageData.width; canvasX++) {
-                //the canvas pixel data is a bit awkward to get at...
-                //see: https://www.w3.org/TR/2dcontext/#pixel-manipulation
-
-                //scale the pixel values to frame the bounds of the set
-                var x0 = xMin + xStep * canvasX;
-                var y0 = yMin + yStep * canvasY;
+                //scale the pixel values to be within the bounds of the set
+                var pos = this.canvasPositionToRealPosition(canvasX, canvasY);
+                var x0 = pos.x;
+                var y0 = pos.y;
 
                 var x = 0.0;
                 var y = 0.0;
@@ -159,7 +161,51 @@ export default class Renderer {
                 this.plot(canvasX, canvasY, color);
             }
         }
+
+        for (var whiteY = 0; whiteY < this._imageData.height; whiteY++) {
+            this.plot(this._imageData.width / 2, whiteY, {
+                r: 255,
+                g: 255,
+                b: 255
+            });
+        }
+        for (var whiteX = 0; whiteX < this._imageData.width; whiteX++) {
+            this.plot(whiteX, this._imageData.height / 2, {
+                r: 255,
+                g: 255,
+                b: 255
+            });
+        }
+
+        var newX = parseInt(-this.xMin / this.xStep);
+        var newY = parseInt(-this.yMin / this.yStep);
+
+        //draw the Real coordinate space axis
+        for (var redX = 0; redX < this._imageData.width; redX++) {
+            this.plot(redX, newY, {
+                r: 255,
+                g: 0,
+                b: 0
+            });
+        }
+
+        for (var redY = 0; redY < this._imageData.height; redY++) {
+            this.plot(newX, redY, {
+                r: 255,
+                g: 0,
+                b: 0
+            });
+        }
+
         //draw it!
         this._context.putImageData(this._imageData, 0, 0);
+    }
+
+    canvasPositionToRealPosition(canvasX, canvasY) {
+        //scale the pixel values to frame the bounds of the set
+        return {
+            x: this.xMin + this.xStep * canvasX,
+            y: this.yMin + this.yStep * canvasY
+        };
     }
 }
