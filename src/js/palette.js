@@ -7,7 +7,7 @@
  * to generate the color palette
  */
 var _rainbow = [];
-for (var i = 0; i < (6 * 7); i++) {
+for (var i = 0; i < (6 * 6); i++) {
     var pi3 = Math.floor(Math.PI / 3);
     var n = (i * (1.0 / 6));
 
