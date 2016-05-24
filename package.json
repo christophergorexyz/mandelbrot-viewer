@@ -31,6 +31,7 @@
     "rainbowify": "^1.0.1"
   },
   "dependencies": {
-    "lodash.assign": "^4.0.9"
+    "lodash.assign": "^4.0.9",
+    "lodash.uniqwith": "^4.3.0"
   }
 }

@@ -105,16 +105,19 @@
             x: _r.x,
             y: _r.y
 
-        }
+        };
+
+        var _initViewData = _viewData;
 
         //}(mandelbrot.Renderer));
 
-        /*function reset() {
-            _viewData.scale = 1;
+        function reset() {
+            _viewData = _initViewData;
+            /*_viewData.scale = 1;
             _viewData.x = -0.75;
-            _viewData.y = 0;
-            renderScene();
-        }*/
+            _viewData.y = 0;*/
+            _renderScene(_viewData);
+        }
 
         function save() {
             var saveData = {};
