@@ -4,7 +4,8 @@ let gulp = require('gulp'),
     browserify = require('browserify'),
     fs = require('fs'),
     path = require('path'),
-    mkdirp = require('mkdirp');
+    mkdirp = require('mkdirp'),
+    express = require('gulp-express');
 
 
 gulp.task('browserify', () => {
@@ -38,10 +39,18 @@ gulp.task('html', () => {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('build', ['browserify', 'html']);
-
-gulp.task('default', ['build', 'watch']);
-
-gulp.task('watch', () => {
-    gulp.watch('src/**/*', ['build']);
+gulp.task('server', () => {
+    return gulp.src('src/index.js')
+        .pipe(gulp.dest('dist'));
 });
+
+gulp.task('build', ['browserify', 'html', 'server']);
+
+gulp.task('dev', ['build', 'server'], () => {
+    express.run(['./index.js'], {
+        cwd: 'dist'
+    });
+    gulp.watch('src/**/*', ['build'], express.notify);
+});
+
+gulp.task('default', ['dev']);
