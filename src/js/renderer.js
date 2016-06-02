@@ -8,6 +8,11 @@ const RIGHT_EDGE = 1;
 const TOP_EDGE = -1;
 const BOTTOM_EDGE = 1;
 
+
+//this is a bitshift operation, not a bool
+//i normally wouldn't, but it's really convenient
+const MAX_RADIUS = (1 << 16);
+
 //because the bounds of the set are uneven, we're horizontally offset this much
 const HORIZONTAL_OFFSET = LEFT_EDGE - ((LEFT_EDGE - RIGHT_EDGE) / 2);
 
@@ -72,10 +77,12 @@ export default class Renderer {
         //the canvas pixel data is a bit awkward to get at...
         //see: https://www.w3.org/TR/2dcontext/#pixel-manipulation
         var dataIndex = (y * this._imageData.width + x) * 4;
-        this._data[dataIndex] = color.r;
-        this._data[dataIndex + 1] = color.g;
-        this._data[dataIndex + 2] = color.b;
-        this._data[dataIndex + 3] = 255; //max saturation
+        if (dataIndex < this._data.length && dataIndex >= 0) {
+            this._data[dataIndex] = color.r;
+            this._data[dataIndex + 1] = color.g;
+            this._data[dataIndex + 2] = color.b;
+            this._data[dataIndex + 3] = 255; //max saturation
+        }
     }
 
     updateViewportSize() {
@@ -124,12 +131,24 @@ export default class Renderer {
         this.yStep = (this.yMax - this.yMin) / this._imageData.height;
     }
 
-    //scale: how far we've zoomed in from the default
-    //dx0: displacement of perspective horizontally
-    //dy0: displacement of perspective vertically
+    interpolateValue(val1, val2, fraction) {
+        return (1 - fraction) * val1 + fraction * val2;
+        //return val1 + (val2 - val1) * fraction;
+    }
+
+    interpolateColor(color1, color2, fraction) {
+            return {
+                r: this.interpolateValue(color1.r, color2.r, fraction),
+                g: this.interpolateValue(color1.g, color2.g, fraction),
+                b: this.interpolateValue(color1.b, color2.b, fraction),
+            };
+        }
+        //scale: how far we've zoomed in from the default
+        //dx0: displacement of perspective horizontally
+        //dy0: displacement of perspective vertically
     render(scale, dx0, dy0) {
         this._scale = scale;
-        this._dx = dx0 - HORIZONTAL_OFFSET/this._scale;
+        this._dx = dx0 - HORIZONTAL_OFFSET / this._scale;
         this._dy = dy0;
 
         this.updateRealBoundaries();
@@ -147,42 +166,60 @@ export default class Renderer {
                 var y = 0.0;
 
                 var iteration = 0;
-                while (x * x + y * y < 2 * 2 && iteration < this._maxIterations) {
+                while (x * x + y * y < MAX_RADIUS * 2 && iteration < this._maxIterations) {
                     var tempX = x * x - y * y + x0;
                     y = 2 * x * y + y0;
                     x = tempX;
                     iteration++;
                 }
 
-                //if we've maxed out our iterations, it's a close
-                //enough approximation, so color it black
-                var color = iteration === this._maxIterations ? this._mandelbrotColor : this._palette[iteration % this._palette.length];
+                //deafult to black unless we managed to rule this pixel out
+                var color = this._mandelbrotColor;
+
+                if (iteration < this._maxIterations) {
+                    var log_zn = Math.log(x * x + y * y) / 2;
+                    var nu = Math.log(log_zn / Math.log(2)) / Math.log(2);
+                    iteration = iteration + 1 - nu;
+
+
+                    var color1 = this._palette[Math.floor(iteration) % this._palette.length];
+                    var color2 = this._palette[(Math.floor(iteration) + 1) % this._palette.length];
+
+                    color = this.interpolateColor(color1, color2, iteration % 1);
+                }
 
                 this.plot(canvasX, canvasY, color);
             }
         }
 
+        //TODO: decide if worth bothering adding below commented code for debugging purposes
+        /*
+        var whitePos = {
+            x: this._imageData.width/2,
+            y: this._imageData.height/2
+        };
+
         for (var whiteY = 0; whiteY < this._imageData.height; whiteY++) {
-            this.plot(this._imageData.width / 2, whiteY, {
+            this.plot(whitePos.x, whiteY, {
                 r: 255,
                 g: 255,
                 b: 255
             });
         }
         for (var whiteX = 0; whiteX < this._imageData.width; whiteX++) {
-            this.plot(whiteX, this._imageData.height / 2, {
+            this.plot(whiteX, whitePos.y, {
                 r: 255,
                 g: 255,
                 b: 255
             });
         }
 
-        var newX = parseInt(-this.xMin / this.xStep);
-        var newY = parseInt(-this.yMin / this.yStep);
+
+        var redPos = this.realPositionToCanvasPosition(0, 0);
 
         //draw the Real coordinate space axis
         for (var redX = 0; redX < this._imageData.width; redX++) {
-            this.plot(redX, newY, {
+            this.plot(redX, redPos.y, {
                 r: 255,
                 g: 0,
                 b: 0
@@ -190,15 +227,23 @@ export default class Renderer {
         }
 
         for (var redY = 0; redY < this._imageData.height; redY++) {
-            this.plot(newX, redY, {
+            this.plot(redPos.x, redY, {
                 r: 255,
                 g: 0,
                 b: 0
             });
         }
+        */
 
         //draw it!
         this._context.putImageData(this._imageData, 0, 0);
+    }
+
+    realPositionToCanvasPosition(realX, realY) {
+        return {
+            x: parseInt((realX - this.xMin) / this.xStep),
+            y: parseInt((realY - this.yMin) / this.yStep)
+        };
     }
 
     canvasPositionToRealPosition(canvasX, canvasY) {

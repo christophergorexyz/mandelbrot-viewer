@@ -1,6 +1,8 @@
 'use strict';
-let express = require('express');
-let app = express();
+let express = require('express'),
+    app = express(),
+    renderer = require('./js/renderer');
+
 
 app.use('/js', express.static('js'));
 
