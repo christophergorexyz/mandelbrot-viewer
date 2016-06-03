@@ -133,7 +133,6 @@ export default class Renderer {
 
     interpolateValue(val1, val2, fraction) {
         return (1 - fraction) * val1 + fraction * val2;
-        //return val1 + (val2 - val1) * fraction;
     }
 
     interpolateColor(color1, color2, fraction) {
@@ -153,8 +152,9 @@ export default class Renderer {
 
         this.updateRealBoundaries();
 
-        //An implementation of the Escape Time Algorithm
-        //https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
+        //An implementation of the Escape Time Algorithm with continuous coloring
+        //almost directly from https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
+        //with https://en.wikipedia.org/wiki/Mandelbrot_set#Continuous_.28smooth.29_coloring
         for (var canvasY = 0; canvasY < this._imageData.height; canvasY++) {
             for (var canvasX = 0; canvasX < this._imageData.width; canvasX++) {
                 //scale the pixel values to be within the bounds of the set
