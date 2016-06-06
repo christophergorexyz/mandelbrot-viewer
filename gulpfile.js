@@ -1,5 +1,7 @@
 'use strict';
 let gulp = require('gulp'),
+    gutil = require('gulp-util'),
+    babel = require('babel-core'),
     babelify = require('babelify'),
     browserify = require('browserify'),
     fs = require('fs'),
@@ -9,9 +11,9 @@ let gulp = require('gulp'),
 
 
 gulp.task('browserify', () => {
-    mkdirp('dist/js');
-    return browserify({
-            entries: ['src/js/index'],
+    mkdirp('dist/static/js');
+    browserify({
+            entries: ['src/static/js/index'],
             standalone: 'mandelbrot',
             debug: true
         })
@@ -19,28 +21,44 @@ gulp.task('browserify', () => {
             presets: ['es2015']
         })
         .bundle()
-        .on('error', function (err) {
-            console.log();
-            console.log("Error: " + err.message);
-
-            console.log("\tFile: " + err.filename);
-            console.log("\tLine: " + err.loc.line);
-            console.log("\tColumn: " + err.loc.column);
-            console.log(err.codeFrame);
-            this.emit('end');
-        })
-        .pipe(fs.createWriteStream(path.join(__dirname, 'dist/js', 'index.js'), {
+        .on('error', gutil.log)
+        .pipe(fs.createWriteStream(path.join(__dirname, 'dist/static/js', 'index.js'), {
             encoding: 'utf-8'
         }));
+
+    return babel.transformFile('src/renderer', {
+        presets: ['es2015'],
+        sourceMaps: false
+    }, function (err, result) {
+        if (err) {
+            return gutil.log(err);
+        }
+        var ws = fs.createWriteStream(path.join(__dirname, 'dist', 'renderer.js'));
+        ws.write(result.code);
+        ws.end();
+    });
+    //.pipe(fs.createWriteStream(path.join(__dirname, 'dist', 'renderer.js')));
+
+    /*
+    return browserify('src/renderer')
+        .transform(babelify, {
+            presets: ['es2015']
+        })
+        .bundle()
+        .on('error', gutil.log)
+        .pipe(fs.createWriteStream(path.join(__dirname, 'dist', 'renderer.js'), {
+            encouding: 'utf-8'
+        }));*/
 });
 
+
 gulp.task('html', () => {
-    return gulp.src('src/index.html')
-        .pipe(gulp.dest('dist'));
+    return gulp.src('src/static/index.html')
+        .pipe(gulp.dest('dist/static'));
 });
 
 gulp.task('server', () => {
-    return gulp.src('src/index.js')
+    return gulp.src('src/*.js')
         .pipe(gulp.dest('dist'));
 });
 

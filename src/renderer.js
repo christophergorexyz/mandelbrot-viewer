@@ -23,7 +23,7 @@ const MIMETYPE_PNG = 'image/png';
 
 const DEFAULT_SETTINGS = {
     palette: 'rainbow',
-    maxIterations: 1000, //probably better NOT to set this in the options?
+    maxIterations: 1000, //maybe better NOT to set this in the options?
     mandelbrotColor: {
         r: 0,
         g: 0,
@@ -31,7 +31,7 @@ const DEFAULT_SETTINGS = {
     }
 };
 
-export default class Renderer {
+class Renderer {
     constructor(canvas, options) {
 
         options = assign({}, options, DEFAULT_SETTINGS);
@@ -254,3 +254,5 @@ export default class Renderer {
         };
     }
 }
+
+export default Renderer;

@@ -23,15 +23,18 @@
   },
   "homepage": "http://theoutliar.github.io/mandelbrot-viewer/",
   "devDependencies": {
+    "babel-core": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "gulp": "^3.9.1",
     "gulp-express": "^0.3.5",
+    "gulp-util": "^3.0.7",
     "mkdirp": "^0.5.1",
     "rainbowify": "^1.0.1"
   },
   "dependencies": {
+    "canvas": "^1.3.16",
     "express": "^4.13.4",
     "lodash.assign": "^4.0.9",
     "lodash.uniqwith": "^4.3.0"
