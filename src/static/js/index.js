@@ -1,5 +1,5 @@
-import Renderer from '../../renderer';
-import Palette from '../../palette';
+import Renderer from '../../ui/renderer';
+import Palette from '../../ui/palette';
 export {
     Renderer
 };

@@ -1,10 +1,8 @@
-'use strict';
-let express = require('express'),
-    app = express(),
-    Renderer = require('./renderer'),
-    Canvas = require('canvas');
+import Renderer from './ui/renderer';
+import Canvas from 'canvas';
+import express from 'express';
 
-console.log(Renderer);
+let app = express();
 
 app.use(express.static('static'));
 
