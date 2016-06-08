@@ -181,7 +181,6 @@ class Renderer {
                     var nu = Math.log(log_zn / Math.log(2)) / Math.log(2);
                     iteration = iteration + 1 - nu;
 
-
                     var color1 = this._palette[Math.floor(iteration) % this._palette.length];
                     var color2 = this._palette[(Math.floor(iteration) + 1) % this._palette.length];
 
