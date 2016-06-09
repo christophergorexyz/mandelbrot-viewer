@@ -34,7 +34,7 @@ const DEFAULT_SETTINGS = {
 class Renderer {
     constructor(canvas, options) {
 
-        options = assign({}, options, DEFAULT_SETTINGS);
+        options = assign({}, DEFAULT_SETTINGS, options);
 
         this._canvas = canvas;
         this._context = this._canvas.getContext('2d');
