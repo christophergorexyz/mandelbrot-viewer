@@ -1,5 +1,4 @@
-import palette from './palette';
-
+import coloringMethod from './coloring-method';
 import assign from 'lodash.assign';
 
 //the bounds of the set
@@ -7,11 +6,6 @@ const LEFT_EDGE = -2.5;
 const RIGHT_EDGE = 1;
 const TOP_EDGE = -1;
 const BOTTOM_EDGE = 1;
-
-
-//this is a bitshift operation, not a bool
-//i normally wouldn't, but it's really convenient
-const MAX_RADIUS = (1 << 16);
 
 //because the bounds of the set are uneven, we're horizontally offset this much
 const HORIZONTAL_OFFSET = LEFT_EDGE - ((LEFT_EDGE - RIGHT_EDGE) / 2);
@@ -22,8 +16,8 @@ const MANDEL_RATIO = (RIGHT_EDGE - LEFT_EDGE) / (BOTTOM_EDGE - TOP_EDGE);
 const MIMETYPE_PNG = 'image/png';
 
 const DEFAULT_SETTINGS = {
-    palette: 'rainbow',
-    maxIterations: 1000, //maybe better NOT to set this in the options?
+    coloringMethod: 'default',
+    palette: 'default',
     mandelbrotColor: {
         r: 0,
         g: 0,
@@ -41,9 +35,9 @@ class Renderer {
         this._imageData = this._context.createImageData(this._canvas.width, this._canvas.height);
         this._data = this._imageData.data;
 
-        this._maxIterations = options.maxIterations;
         this._mandelbrotColor = options.mandelbrotColor;
-        this._palette = palette[options.palette];
+        this._palette = options.palette;
+        this._coloringMethod = coloringMethod[options.coloringMethod];
 
         //TODO: decide if this is beset approach.
         //is it better to let user be absolute in this?
@@ -131,20 +125,9 @@ class Renderer {
         this.yStep = (this.yMax - this.yMin) / this._imageData.height;
     }
 
-    interpolateValue(val1, val2, fraction) {
-        return (1 - fraction) * val1 + fraction * val2;
-    }
-
-    interpolateColor(color1, color2, fraction) {
-            return {
-                r: this.interpolateValue(color1.r, color2.r, fraction),
-                g: this.interpolateValue(color1.g, color2.g, fraction),
-                b: this.interpolateValue(color1.b, color2.b, fraction),
-            };
-        }
-        //scale: how far we've zoomed in from the default
-        //dx0: displacement of perspective horizontally
-        //dy0: displacement of perspective vertically
+    //scale: how far we've zoomed in from the default
+    //dx0: displacement of perspective horizontally
+    //dy0: displacement of perspective vertically
     render(scale, dx0, dy0) {
         this._scale = scale;
         this._dx = dx0 - HORIZONTAL_OFFSET / this._scale;
@@ -162,30 +145,9 @@ class Renderer {
                 var x0 = pos.x;
                 var y0 = pos.y;
 
-                var x = 0.0;
-                var y = 0.0;
-
-                var iteration = 0;
-                while (x * x + y * y < MAX_RADIUS * 2 && iteration < this._maxIterations) {
-                    var tempX = x * x - y * y + x0;
-                    y = 2 * x * y + y0;
-                    x = tempX;
-                    iteration++;
-                }
-
-                //deafult to black unless we managed to rule this pixel out
-                var color = this._mandelbrotColor;
-
-                if (iteration < this._maxIterations) {
-                    var log_zn = Math.log(x * x + y * y) / 2;
-                    var nu = Math.log(log_zn / Math.log(2)) / Math.log(2);
-                    iteration = iteration + 1 - nu;
-
-                    var color1 = this._palette[Math.floor(iteration) % this._palette.length];
-                    var color2 = this._palette[(Math.floor(iteration) + 1) % this._palette.length];
-
-                    color = this.interpolateColor(color1, color2, iteration % 1);
-                }
+                var color = this._coloringMethod(x0, y0, {
+                    palette: this._palette
+                });
 
                 this.plot(canvasX, canvasY, color);
             }

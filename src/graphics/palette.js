@@ -28,6 +28,10 @@ for (var i = 0; i < (6 * 7); i++) {
     _rainbow.push(rgb(r, g, b));
 }
 
+_rainbow = uniqwith(_rainbow, function (val1, val2) {
+    return val1.r === val2.r && val1.g === val2.g && val1.b === val2.b;
+});
+
 var _materialDesignRainbow500 = [
     rgb(244, 67, 54),
     rgb(233, 30, 99),
@@ -73,9 +77,8 @@ var _grayScale = [
 
 
 export default {
-    rainbow: uniqwith(_rainbow, function (val1, val2) {
-        return val1.r === val2.r && val1.g === val2.g && val1.b === val2.b;
-    }),
+    default: _materialDesignRainbowA400,
+    rainbow: _rainbow,
     materialDesignRainbow500: _materialDesignRainbow500,
     materialDesignRainbowA400: _materialDesignRainbowA400,
     grayScale: _grayScale

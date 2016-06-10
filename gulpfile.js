@@ -40,13 +40,13 @@ gulp.task('server', () => {
     gulp.src(['src/graphics/*.js'])
         .pipe(babel({
             presets: ['es2015']
-        }))
+        }).on('error', gutil.log))
         .pipe(gulp.dest('dist/graphics'));
 
     return gulp.src(['src/*.js'])
         .pipe(babel({
             presets: ['es2015']
-        }))
+        }).on('error', gutil.log))
         .pipe(gulp.dest('dist'));
 });
 
