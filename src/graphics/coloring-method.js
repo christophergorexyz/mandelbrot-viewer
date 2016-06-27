@@ -5,6 +5,8 @@ import palette from './palette';
 //i normally wouldn't, but it's really convenient here
 const MAX_RADIUS_CONTINUOUS = (1 << 16);
 
+const MAX_RADIUS_DISTANCE_ESTIMATION = (1 << 20);
+
 const MAX_RADIUS_ESCAPE_TIME = (1 << 2);
 
 const MAX_ITERATIONS = 1000;
@@ -90,8 +92,43 @@ function _continuousColoring(x0, y0, options) {
     return color;
 }
 
+function _exteriorDistanceEstimation(cx, cy, options) {
+    options = assign({}, DEFAULT_SETTINGS, options);
+    var _palette = palette[options.palette];
+    var _maxIterations = MAX_ITERATIONS + (MAX_ITERATIONS % _palette.length);
+
+
+    var zx = 0.0;
+    var zy = 0.0;
+    var dx = 0.0;
+    var dy = 0.0;
+    var iteration = 0;
+    while (zx * zx + zy * zy < MAX_RADIUS_DISTANCE_ESTIMATION && iteration < _maxIterations) {
+
+        dx = 2 * zx * dx - 2 * zy * dx + 1;
+        dy = 4 * zx * dy;
+
+        var tempZx = zx * zx - zy * zy + cx;
+        zy = 2 * zx * zy + cy;
+        zx = tempZx;
+        iteration++;
+    }
+
+    var distanceEstimate = Math.sqrt((zx * zx + zy * zy) / (dx * dx + dy * dy)) * 0.5 * Math.log(zx * zx + zy * zy);
+    //console.log(distanceEstimate);
+
+    var color = options.mandelbrotColor;
+
+    if (iteration < _maxIterations) {
+        color = _palette[Math.floor(iteration % _palette.length)];
+    }
+
+    return color;
+}
+
 export default {
     default: _continuousColoring,
     escapeTime: _escapeTime,
-    continuousColoring: _continuousColoring
+    continuousColoring: _continuousColoring,
+    exteriorDistanceEstimation: _exteriorDistanceEstimation
 };

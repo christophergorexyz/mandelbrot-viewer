@@ -98,7 +98,7 @@
 
         _setCanvasWidth();
 
-        var _r = new Renderer(_canvas);
+        var _r = new Renderer(_canvas, { coloringMethod: 'exteriorDistanceEstimation'});
 
         var _viewData = {
             scale: 1,
