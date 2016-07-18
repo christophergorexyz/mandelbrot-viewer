@@ -3,7 +3,7 @@ let gulp = require('gulp'),
     gutil = require('gulp-util'),
     browserify = require('browserify'),
     babel = require('gulp-babel'),
-    liveserver = require('gulp-live-server'),
+    gls = require('gulp-live-server'),
     babelify = require('babelify'),
     mkdirp = require('mkdirp'),
     fs = require('fs'),
@@ -58,29 +58,30 @@ gulp.task('server', () => {
 gulp.task('build', ['browserify', 'html', 'server']);
 
 gulp.task('dev', ['build'], () => {
-    let lserver = liveserver('./index.js', {
+    let server = gls('./index.js', {
         cwd: 'dist',
     });
-    lserver.start();
+    server.start();
 
-    lserver.server.on('message', (message) => {
+    server.server.stdout.on('data', (message) => {
         gutil.log(message);
         gulp.src(__filename).pipe(
             gopen({
                 uri: 'http://localhost:3000'
             })
         );
-
     });
 
     gulp.watch(['src/graphics/**/*.js', 'src/index.js'], ['server']);
     gulp.watch(['src/static/**/*.html'], ['html']);
     gulp.watch(['src/graphics/**/*.js', 'src/static/js/**/*.js'], ['browserify']);
 
-    gulp.watch(['dist/**/*.html', 'dist/static/**/*'], (file) => {
-        lserver.notify.apply(lserver, file);
+    gulp.watch(['dist/static/**/*'], (file) => {
+        server.notify.apply(server, [file]);
     });
-    gulp.watch('dist/index.js', lserver.start.bind(lserver));
+    gulp.watch('dist/index.js', function(){
+        server.start.bind(server)();
+    });
 });
 
 gulp.task('default', ['dev']);

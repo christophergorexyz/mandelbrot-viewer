@@ -43,6 +43,4 @@ function render(x, y, scale, width, height) {
 
 app.listen(3000);
 
-process.send = process.send || function () {};
-
 console.log('Express server listening on port 3000');
