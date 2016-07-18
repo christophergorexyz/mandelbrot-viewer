@@ -98,7 +98,10 @@
 
         _setCanvasWidth();
 
-        var _r = new Renderer(_canvas, { coloringMethod: 'exteriorDistanceEstimation'});
+        var _r = new Renderer(_canvas, {
+            coloringMethod: 'exteriorDistanceEstimation',
+            palette: 'materialDesignRainbow500'
+        });
 
         var _viewData = {
             scale: 1,
@@ -178,10 +181,10 @@
             }
         }
 
-        _canvas.addEventListener('click', function(e){
+        _canvas.addEventListener('click', function(e) {
             e.preventDefault();
             var pos = _r.canvasPositionToRealPosition(e.layerX, e.layerY);
-            _viewData.x  = pos.x;
+            _viewData.x = pos.x;
             _viewData.y = pos.y;
             zoomIn();
         });
@@ -189,6 +192,7 @@
         window.addEventListener('resize', _handleWindowResize);
 
         _handleWindowResize();
+
     </script>
 </body>
 

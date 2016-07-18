@@ -146,7 +146,9 @@ class Renderer {
                 var y0 = pos.y;
 
                 var color = this._coloringMethod(x0, y0, {
-                    palette: this._palette
+                    palette: this._palette,
+                    pixelSize: this.xStep,
+                    canvasWidth: this._canvas.width
                 });
 
                 this.plot(canvasX, canvasY, color);

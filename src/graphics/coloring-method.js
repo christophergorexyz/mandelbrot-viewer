@@ -96,6 +96,7 @@ function _exteriorDistanceEstimation(cx, cy, options) {
     options = assign({}, DEFAULT_SETTINGS, options);
     var _palette = palette[options.palette];
     var _maxIterations = MAX_ITERATIONS + (MAX_ITERATIONS % _palette.length);
+    var _maxDistance = options.pixelSize*options.canvasWidth*0.0333;
 
 
     var zx = 0.0;
@@ -105,22 +106,24 @@ function _exteriorDistanceEstimation(cx, cy, options) {
     var iteration = 0;
     while (zx * zx + zy * zy < MAX_RADIUS_DISTANCE_ESTIMATION && iteration < _maxIterations) {
 
-        dx = 2 * zx * dx - 2 * zy * dx + 1;
+        dx = (2 * zx * dx) - (2 * zy * dx) + 1;
         dy = 4 * zx * dy;
 
-        var tempZx = zx * zx - zy * zy + cx;
-        zy = 2 * zx * zy + cy;
+        var tempZx = (zx * zx) - (zy * zy) + cx;
+        zy = (2 * zx * zy) + cy;
         zx = tempZx;
         iteration++;
     }
 
     var distanceEstimate = Math.sqrt((zx * zx + zy * zy) / (dx * dx + dy * dy)) * 0.5 * Math.log(zx * zx + zy * zy);
-    //console.log(distanceEstimate);
 
     var color = options.mandelbrotColor;
 
     if (iteration < _maxIterations) {
-        color = _palette[Math.floor(iteration % _palette.length)];
+        var color1 = _palette[Math.floor(distanceEstimate/_maxDistance) % _palette.length];
+        var color2 = _palette[(Math.floor(distanceEstimate/_maxDistance) + 1) % _palette.length];
+
+        color = _interpolateColor(color1, color2, distanceEstimate/_maxDistance);
     }
 
     return color;
