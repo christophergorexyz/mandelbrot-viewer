@@ -63,6 +63,7 @@ gulp.task('dev', ['build'], () => {
     });
     server.start();
 
+    //wait for some stdout from server to launch browser
     server.server.stdout.on('data', (message) => {
         gutil.log(message);
         gulp.src(__filename).pipe(
@@ -79,7 +80,7 @@ gulp.task('dev', ['build'], () => {
     gulp.watch(['dist/static/**/*'], (file) => {
         server.notify.apply(server, [file]);
     });
-    gulp.watch('dist/index.js', function(){
+    gulp.watch(['dist/index.js', 'dist/graphics/*'], function(){
         server.start.bind(server)();
     });
 });

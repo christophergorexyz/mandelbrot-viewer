@@ -17,32 +17,20 @@ const MIMETYPE_PNG = 'image/png';
 
 const DEFAULT_SETTINGS = {
     coloringMethod: 'default',
-    palette: 'default',
-    mandelbrotColor: {
-        r: 0,
-        g: 0,
-        b: 0
-    }
+    palette: 'default'
 };
 
 class Renderer {
     constructor(canvas, options) {
 
-        options = assign({}, DEFAULT_SETTINGS, options);
+        this._options = assign({}, DEFAULT_SETTINGS, options);
 
         this._canvas = canvas;
         this._context = this._canvas.getContext('2d');
         this._imageData = this._context.createImageData(this._canvas.width, this._canvas.height);
         this._data = this._imageData.data;
 
-        this._mandelbrotColor = options.mandelbrotColor;
-        this._palette = options.palette;
         this._coloringMethod = coloringMethod[options.coloringMethod];
-
-        //TODO: decide if this is beset approach.
-        //is it better to let user be absolute in this?
-        //or to enforce perfect cycle of palette?
-        this._maxIterations = this._maxIterations + (this._maxIterations % this._palette.length);
 
         this.updateViewportSize();
 
@@ -145,11 +133,10 @@ class Renderer {
                 var x0 = pos.x;
                 var y0 = pos.y;
 
-                var color = this._coloringMethod(x0, y0, {
-                    palette: this._palette,
+                var color = this._coloringMethod(x0, y0, assign(this._options, {
                     pixelSize: this.xStep,
                     canvasWidth: this._canvas.width
-                });
+                }));
 
                 this.plot(canvasX, canvasY, color);
             }
