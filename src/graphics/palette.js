@@ -77,11 +77,11 @@ var _grayScale = [
 
 
 export default {
-    default: _materialDesignRainbowA400,
-    rainbow: _rainbow,
-    materialDesignRainbow500: _materialDesignRainbow500,
-    materialDesignRainbowA400: _materialDesignRainbowA400,
-    grayScale: _grayScale
+    'default': _rainbow,
+    'rainbow': _rainbow,
+    'material-design-rainbow-500': _materialDesignRainbow500,
+    'material-design-rainbow-a400': _materialDesignRainbowA400,
+    'gray-scale': _grayScale
 };
 
 //TODO:

@@ -130,8 +130,8 @@ function _exteriorDistanceEstimation(cx, cy, options) {
 }
 
 export default {
-    default: _continuousColoring,
-    escapeTime: _escapeTime,
-    continuousColoring: _continuousColoring,
-    exteriorDistanceEstimation: _exteriorDistanceEstimation
+    'default': _continuousColoring,
+    'escape-time': _escapeTime,
+    'continuous-coloring': _continuousColoring,
+    'exterior-distance-estimation': _exteriorDistanceEstimation
 };

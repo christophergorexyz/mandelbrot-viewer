@@ -30,7 +30,7 @@ class Renderer {
         this._imageData = this._context.createImageData(this._canvas.width, this._canvas.height);
         this._data = this._imageData.data;
 
-        this._coloringMethod = coloringMethod[options.coloringMethod];
+        this._coloringMethod = coloringMethod[this._options.coloringMethod];
 
         this.updateViewportSize();
 
