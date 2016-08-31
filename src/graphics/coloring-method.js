@@ -20,6 +20,9 @@ const DEFAULT_SETTINGS = {
     }
 };
 
+//An implementation of the Escape Time Algorithm with continuous coloring
+//almost directly from https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
+//with https://en.wikipedia.org/wiki/Mandelbrot_set#Continuous_.28smooth.29_coloring
 function _escapeTime(x0, y0, options) {
     options = assign({}, DEFAULT_SETTINGS, options);
     var _palette = palette[options.palette];

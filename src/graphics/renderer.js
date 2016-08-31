@@ -123,9 +123,6 @@ class Renderer {
 
         this.updateRealBoundaries();
 
-        //An implementation of the Escape Time Algorithm with continuous coloring
-        //almost directly from https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
-        //with https://en.wikipedia.org/wiki/Mandelbrot_set#Continuous_.28smooth.29_coloring
         for (var canvasY = 0; canvasY < this._imageData.height; canvasY++) {
             for (var canvasX = 0; canvasX < this._imageData.width; canvasX++) {
                 //scale the pixel values to be within the bounds of the set
@@ -141,49 +138,6 @@ class Renderer {
                 this.plot(canvasX, canvasY, color);
             }
         }
-
-        //TODO: decide if worth bothering adding below commented code for debugging purposes
-        /*
-        var whitePos = {
-            x: this._imageData.width/2,
-            y: this._imageData.height/2
-        };
-
-        for (var whiteY = 0; whiteY < this._imageData.height; whiteY++) {
-            this.plot(whitePos.x, whiteY, {
-                r: 255,
-                g: 255,
-                b: 255
-            });
-        }
-        for (var whiteX = 0; whiteX < this._imageData.width; whiteX++) {
-            this.plot(whiteX, whitePos.y, {
-                r: 255,
-                g: 255,
-                b: 255
-            });
-        }
-
-
-        var redPos = this.realPositionToCanvasPosition(0, 0);
-
-        //draw the Real coordinate space axis
-        for (var redX = 0; redX < this._imageData.width; redX++) {
-            this.plot(redX, redPos.y, {
-                r: 255,
-                g: 0,
-                b: 0
-            });
-        }
-
-        for (var redY = 0; redY < this._imageData.height; redY++) {
-            this.plot(redPos.x, redY, {
-                r: 255,
-                g: 0,
-                b: 0
-            });
-        }
-        */
 
         //draw it!
         this._context.putImageData(this._imageData, 0, 0);
