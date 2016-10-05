@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/theOutLiar/mandelbrot-viewer.git"
+    "url": "git@github.com:theOutLiar/mandelbrot-viewer.git"
   },
   "keywords": [
     "mandelbrot",
