@@ -17,7 +17,8 @@ const MIMETYPE_PNG = 'image/png';
 
 const DEFAULT_SETTINGS = {
     coloringMethod: 'default',
-    palette: 'default'
+    palette: 'default',
+    loopPalette: false
 };
 
 class Renderer {

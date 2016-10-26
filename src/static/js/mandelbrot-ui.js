@@ -1,4 +1,6 @@
+'use strict';
 var _savedList = document.getElementById('saved-list');
+var _location = document.getElementById('location');
 var _context = _canvas.getContext('2d');
 
 var savedData = window.localStorage.getItem('locations');
