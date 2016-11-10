@@ -38,6 +38,21 @@ _rainbow = uniqwith(_rainbow, function (val1, val2) {
     return val1.r === val2.r && val1.g === val2.g && val1.b === val2.b;
 });
 
+var _colorSchemerPastelRainbow = [
+    hex('#FFCCCC'),
+    hex('#FFE0CC'),
+    hex('#FFEACC'),
+    hex('#FFF4CC'),
+    hex('#FFFECC'),
+    hex('#EFFAC8'),
+    hex('#C7F5C4'),
+    hex('#C4F0F4'),
+    hex('#C4DAF4'),
+    hex('#C9C4F4'),
+    hex('#E1C4F4'),
+    hex('#F6C6E6')
+];
+
 var _materialDesignRed = [
     hex('#FFEBEE'),
     hex('#FFCDD2'),
@@ -435,6 +450,14 @@ var _materialDesignRainbowA400 = [
     rgb([255, 61, 0])
 ];
 
+var _blueBlack = [
+    hex('#000000'),
+    hex('#10142d'),
+    hex('#20295b'),
+    hex('#303d88'),
+    hex('#3F51B5')
+];
+
 var _grayScale = [
     rgb([255, 255, 255]),
     rgb([0, 0, 0, 0])
@@ -444,6 +467,8 @@ var _grayScale = [
 export default {
     'default': _rainbow,
     'rainbow': _rainbow,
+
+    'color-schemer-pastel-rainbow': _colorSchemerPastelRainbow,
 
     'material-design-red': _materialDesignRed,
     'material-design-red-alt': _materialDesignRedAlt,
@@ -499,7 +524,8 @@ export default {
 
     'material-design-rainbow-500': _materialDesignRainbow500,
     'material-design-rainbow-a400': _materialDesignRainbowA400,
-    'gray-scale': _grayScale
+    'gray-scale': _grayScale,
+    'blue-black': _blueBlack
 };
 
 //TODO:

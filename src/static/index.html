@@ -13,8 +13,7 @@
             margin: 0;
             padding: 0;
             font-family: monospace;
-            /*used to eliminate white space*/
-            font-size: 0;
+            font-size: 0; /*used to eliminate white space*/
         }
 
         #mandelbrot {
@@ -31,11 +30,37 @@
             left: 100px;
             background: White;
         }
+
+        .hue-animated {
+            animation: hue 5s infinite linear;
+        }
+
+        @keyframes hue {
+            from {
+                filter: hue-rotate(0deg);
+            }
+            to {
+                filter: hue-rotate(-360deg);
+            }
+        }
+
+        @keyframes invert {
+            from {
+                filter: invert(0);
+            }
+            50% {
+                filter: invert(1);
+            }
+            to {
+                filter: invert(0);
+            }
+        }
+
     </style>
 </head>
 
 <body>
-    <canvas id="mandelbrot"></canvas>
+    <canvas class="hue-animated" id="mandelbrot"></canvas>
 
     <div id="controls">
         <div>
@@ -101,7 +126,8 @@
 
         var _r = new Renderer(_canvas, {
             coloringMethod: 'continuous-coloring',
-            palette: 'material-design-cyan',
+            //palette: 'color-schemer-pastel-rainbow',
+            palette: 'material-design-rainbow-a400',
             //loopPalette: true
         });
 
@@ -173,7 +199,7 @@
             }
         }
 
-        _canvas.addEventListener('click', function (e) {
+        _canvas.addEventListener('click', function(e) {
             e.preventDefault();
             var pos = _r.canvasPositionToRealPosition(e.layerX, e.layerY);
             _viewData.x = pos.x;
@@ -184,6 +210,7 @@
         window.addEventListener('resize', _handleWindowResize);
 
         _handleWindowResize();
+
     </script>
 </body>
 
