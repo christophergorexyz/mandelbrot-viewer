@@ -57,7 +57,7 @@ class UI {
 
         this._r = new Renderer(this._canvas, {
             coloringMethod: 'continuous-coloring',
-            //palette: 'color-schemer-pastel-rainbow',
+            //palette: 'material-design-rainbow-a400',
             palette: 'hue-shift-rainbow-chocolate',
             //loopPalette: true
         });

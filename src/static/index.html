@@ -33,12 +33,44 @@
         }
 
         .hue-animated {
-            animation: hue 15s infinite linear;
+            animation: breathe 15s infinite ease-in-out;
         }
 
         @keyframes hue {
             from {
                 filter: hue-rotate(0deg);
+            }
+            to {
+                filter: hue-rotate(-360deg);
+            }
+        }
+        @keyframes breathe {
+            from {
+                filter: hue-rotate(0deg);
+            }
+            6.25% {
+                filter: hue-rotate(-90deg)
+            }
+            18.75%{
+                filter: hue-rotate(0deg);
+            }
+            31.25%{
+                filter: hue-rotate(-180deg);
+            }
+            43.75%{
+                filter: hue-rotate(-90deg);
+            }
+            56.25%{
+                filter: hue-rotate(-270deg);
+            }
+            68.75%{
+                filter: hue-rotate(-180deg);
+            }
+            81.25%{
+                filter: hue-rotate(-360deg);
+            }
+            93.75% {
+                filter: hue-rotate(-270deg);
             }
             to {
                 filter: hue-rotate(-360deg);
