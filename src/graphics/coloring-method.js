@@ -1,4 +1,3 @@
-import assign from 'lodash.assign';
 import palette from './palette';
 
 //this is a bitshift operation, not a boolean comparison
@@ -32,7 +31,7 @@ function loopPalette(palette){
 //almost directly from https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm
 //with https://en.wikipedia.org/wiki/Mandelbrot_set#Continuous_.28smooth.29_coloring
 function _escapeTime(x0, y0, options) {
-    options = assign({}, DEFAULT_SETTINGS, options);
+    options = Object.assign({}, DEFAULT_SETTINGS, options);
     var _palette = options.loopPalette ? loopPalette(palette[options.palette]): palette[options.palette];
 
     var _maxIterations = MAX_ITERATIONS + (MAX_ITERATIONS % _palette.length);
@@ -71,7 +70,7 @@ function _interpolateColor(color1, color2, fraction) {
 }
 
 function _continuousColoring(x0, y0, options) {
-    options = assign({}, DEFAULT_SETTINGS, options);
+    options = Object.assign({}, DEFAULT_SETTINGS, options);
     var _palette = options.loopPalette ? loopPalette(palette[options.palette]): palette[options.palette];
     var _maxIterations = MAX_ITERATIONS + (MAX_ITERATIONS % _palette.length);
 
@@ -105,7 +104,7 @@ function _continuousColoring(x0, y0, options) {
 }
 
 function _exteriorDistanceEstimation(cx, cy, options) {
-    options = assign({}, DEFAULT_SETTINGS, options);
+    options = Object.assign({}, DEFAULT_SETTINGS, options);
     var _palette = options.loopPalette ? loopPalette(palette[options.palette]): palette[options.palette];
     var _maxIterations = MAX_ITERATIONS + (MAX_ITERATIONS % _palette.length);
     var _maxDistance = options.pixelSize*options.canvasWidth*0.0333;

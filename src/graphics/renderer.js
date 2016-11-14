@@ -1,5 +1,4 @@
 import coloringMethod from './coloring-method';
-import assign from 'lodash.assign';
 
 //the bounds of the set
 const LEFT_EDGE = -2.5;
@@ -24,7 +23,7 @@ const DEFAULT_SETTINGS = {
 class Renderer {
     constructor(canvas, options) {
 
-        this._options = assign({}, DEFAULT_SETTINGS, options);
+        this._options = Object.assign({}, DEFAULT_SETTINGS, options);
 
         this._canvas = canvas;
         this._context = this._canvas.getContext('2d');
@@ -42,18 +41,6 @@ class Renderer {
 
     get DataUrl() {
         return this._canvas.toDataURL(MIMETYPE_PNG);
-    }
-
-    get x() {
-        return this._dx;
-    }
-
-    get y() {
-        return this._dy;
-    }
-
-    get scale() {
-        return this._scale;
     }
 
     plot(x, y, color) {
@@ -95,17 +82,17 @@ class Renderer {
             ratio = (MANDEL_RATIO / this._imageRatio);
             product = (BOTTOM_EDGE - TOP_EDGE) * ratio;
 
-            this._topEdge = -product * (1 / 2.0);
-            this._bottomEdge = product * (1 / 2.0);
+            this._topEdge = -product / 2.0;
+            this._bottomEdge = product / 2.0;
         }
     }
 
     updateRealBoundaries() {
         //the Real (ℝ) boundaries of the rendering given the zoom and offset
-        this.xMax = this._rightEdge / this.scale + this.x;
-        this.xMin = this._leftEdge / this.scale + this.x;
-        this.yMax = this._bottomEdge / this.scale + this.y;
-        this.yMin = this._topEdge / this.scale + this.y;
+        this.xMax = this._rightEdge / this._scale + this._dx;
+        this.xMin = this._leftEdge / this._scale + this._dx;
+        this.yMax = this._bottomEdge / this._scale + this._dy;
+        this.yMin = this._topEdge / this._scale + this._dy;
 
         //translation of "Pixel space" to Real (ℝ) space
         //i.e., these variables represent the Real difference
@@ -119,7 +106,8 @@ class Renderer {
     //dy0: displacement of perspective vertically
     render(scale, dx0, dy0) {
         this._scale = scale;
-        this._dx = dx0 - HORIZONTAL_OFFSET / this._scale;
+
+        this._dx = dx0 - (HORIZONTAL_OFFSET / this._scale);
         this._dy = dy0;
 
         this.updateRealBoundaries();
@@ -127,11 +115,11 @@ class Renderer {
         for (var canvasY = 0; canvasY < this._imageData.height; canvasY++) {
             for (var canvasX = 0; canvasX < this._imageData.width; canvasX++) {
                 //scale the pixel values to be within the bounds of the set
-                var pos = this.canvasPositionToRealPosition(canvasX, canvasY);
+                var pos = this.realPositionToComplexPosition(canvasX, canvasY);
                 var x0 = pos.x;
                 var y0 = pos.y;
 
-                var color = this._coloringMethod(x0, y0, assign(this._options, {
+                var color = this._coloringMethod(x0, y0, Object.assign(this._options, {
                     pixelSize: this.xStep,
                     canvasWidth: this._canvas.width
                 }));
@@ -144,18 +132,20 @@ class Renderer {
         this._context.putImageData(this._imageData, 0, 0);
     }
 
-    realPositionToCanvasPosition(realX, realY) {
+    //r= the real part of the number
+    //c= the complex part of the number
+    complexPositionToRealPosition(r, i) {
         return {
-            x: parseInt((realX - this.xMin) / this.xStep),
-            y: parseInt((realY - this.yMin) / this.yStep)
+            x: parseInt((r - this.xMin) / this.xStep),
+            y: parseInt((i - this.yMin) / this.yStep)
         };
     }
 
-    canvasPositionToRealPosition(canvasX, canvasY) {
+    realPositionToComplexPosition(realX, realY) {
         //scale the pixel values to frame the bounds of the set
         return {
-            x: this.xMin + this.xStep * canvasX,
-            y: this.yMin + this.yStep * canvasY
+            x: this.xMin + this.xStep * realX,
+            y: this.yMin + this.yStep * realY
         };
     }
 }

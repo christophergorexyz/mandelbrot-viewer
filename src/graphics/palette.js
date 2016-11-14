@@ -1,15 +1,6 @@
 import uniqwith from 'lodash.uniqwith';
 import hexrgb from 'hex-rgb';
 
-/*
- * the following loop was
- * modified from rainbowify
- * (https://github.com/maxogden/rainbowify)
- * which lifted from mocha
- * (https://github.com/visionmedia/mocha/blob/master/lib/reporters/nyan.js)
- * to generate the color palette
- */
-
 function rgb(colorArray) {
     return {
         r: colorArray[0],
@@ -22,6 +13,14 @@ function hex(hexstring) {
     return rgb(hexrgb(hexstring));
 }
 
+/*
+ * the following loop was
+ * modified from rainbowify
+ * (https://github.com/maxogden/rainbowify)
+ * which lifted from mocha
+ * (https://github.com/visionmedia/mocha/blob/master/lib/reporters/nyan.js)
+ * to generate the color palette
+ */
 var _rainbow = [];
 for (var i = 0; i < (6 * 7); i++) {
     var pi3 = Math.floor(Math.PI / 3);
@@ -450,6 +449,33 @@ var _materialDesignRainbowA400 = [
     rgb([255, 61, 0])
 ];
 
+var _hueShiftRainbowChocolate = [
+    hex('#d2691e'),
+    hex('#e76038'),
+    hex('#f45956'),
+    hex('#f95477'),
+    hex('#f65298'),
+    hex('#ea53b7'),
+    hex('#d656d2'),
+    hex('#bc5be7'),
+    hex('#9e63f4'),
+    hex('#7d6cf9'),
+    hex('#5c77f6'),
+    hex('#3d81ea'),
+    hex('#228bd6'),
+    hex('#0d94bc'),
+    hex('#009b9e'),
+    hex('#00a07d'),
+    hex('#00a25c'),
+    hex('#0aa13d'),
+    hex('#1e9e22'),
+    hex('#38990d'),
+    hex('#569100'),
+    hex('#778800'),
+    hex('#987d00'),
+    hex('#b7730a')
+]
+
 var _blueBlack = [
     hex('#000000'),
     hex('#10142d'),
@@ -525,9 +551,9 @@ export default {
     'material-design-rainbow-500': _materialDesignRainbow500,
     'material-design-rainbow-a400': _materialDesignRainbowA400,
     'gray-scale': _grayScale,
-    'blue-black': _blueBlack
+    'blue-black': _blueBlack,
+
+    'hue-shift-rainbow-chocolate': _hueShiftRainbowChocolate
 };
 
-//TODO:
-// 1. create additional predefined palettes
-// 2. develop interface for saving/loading user-defined palettes to local storage
+//TODO: allow users to CRUD their own color palettes to localstorage
