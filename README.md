@@ -4,7 +4,7 @@
 
 A viewer for the mandelbrot set [http://theoutliar.github.io/mandelbrot-viewer/](http://theoutliar.github.io/mandelbrot-viewer/) 
 
-Each coordinate in Real (ℝ) space represents the components of a complex number. 
+Each coordinate represents the components of a complex number. 
 
 The colorization is achieved by testing whether the iterative application of a certain function to those components results in divergence from particular boundaries. 
 
