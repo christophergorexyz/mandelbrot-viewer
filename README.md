@@ -2,7 +2,7 @@
 
 🌈 🌈 🌈 🌈 🌈 🌈 🌈 
 
-A viewer for the mandelbrot set [http://christophergorexyz.github.io/mandelbrot-viewer/](http://theoutliar.github.io/mandelbrot-viewer/) 
+A viewer for the mandelbrot set [http://christophergorexyz.github.io/mandelbrot-viewer/](http://christophergorexyz.github.io/mandelbrot-viewer/) 
 
 Each coordinate represents the components of a complex number. 
 
