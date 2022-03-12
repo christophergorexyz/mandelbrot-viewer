@@ -4,8 +4,11 @@
   "description": "a mandelbrot visualizer",
   "main": "index.js",
   "scripts": {
-    "predev": "npm prune && npm install",
-    "dev": "gulp | rainbowify"
+    "doc": "jsdoc -r README.md src/ -d docs",
+    "compile": "babel src/ -d lib/ -D -s & (browserify src/index.js -s mandelbrot -d -t [ babelify ] | uglifyjs > dist/mandelbrot-viewer.min.js)",
+    "build": "npm run doc & npm run compile",
+    "prestart": "npm prune && npm install && npm run build",
+    "start": "http-server -o demo/"
   },
   "repository": {
     "type": "git",
@@ -19,28 +22,24 @@
   "author": "Christopher J Gore",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/theOutLiar/mandelbrot-viewer/issues"
+    "url": "https://github.com/christophergorexyz/mandelbrot-viewer/issues"
   },
-  "homepage": "http://theoutliar.github.io/mandelbrot-viewer/",
+  "homepage": "http://christophergorexyz.github.io/mandelbrot-viewer/",
   "devDependencies": {
-    "babel-preset-es2015": "^6.9.0",
-    "babelify": "^7.3.0",
-    "browserify": "^13.0.1",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-inject-reload": "0.0.2",
-    "gulp-live-server": "0.0.30",
-    "gulp-open": "^2.0.0",
-    "gulp-util": "^3.0.7",
-    "mkdirp": "^0.5.1",
-    "rainbowify": "^1.0.1"
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.5",
+    "@babel/preset-env": "^7.16.11",
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
+    "eslint": "^8.11.0",
+    "eslint-plugin-jsdoc": "^38.0.2",
+    "http-server": "^13",
+    "jsdoc": "^3.6.10",
+    "uglify-js": "^3.15.3"
   },
-  "dependencies": {
-    "canvas": "^1.3.16",
-    "common-tags": "^1.4.0",
-    "connect-livereload": "^0.5.4",
-    "express": "^4.13.4",
-    "hex-rgb": "^1.0.0",
-    "lodash.uniqwith": "^4.3.0"
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
   }
 }

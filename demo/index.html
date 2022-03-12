@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Mandelbrot</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      font-size: 0;
+    }
+
+    #mandelbrot {
+      background: transparent;
+      width: 100%;
+      height: 100%;
+    }
+
+    #controls {
+      font-size: initial;
+      padding: 1em;
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      background: White;
+    }
+
+  </style>
+</head>
+
+<body>
+  <canvas class="hue-animated" id="mandelbrot"></canvas>
+  <div id="controls"></div>
+
+  <script src="../dist/mandelbrot-viewer.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var _canvas = document.getElementById('mandelbrot');
+
+    var MandelbrotUI = mandelbrot.UI;
+    var _ui = new MandelbrotUI(_canvas, 'controls');
+
+    function _setCanvasSize() {
+      _canvas.width = window.innerWidth;
+      _canvas.height = window.innerHeight;
+    }
+
+    //resize fires too many times
+    //better to wait til it's finished,
+    //then perform the operation
+    //var resizetimer;
+    window.addEventListener('resize', function (e) {
+      //    if (resizetimer) {
+      //        clearTimeout(resizetimer);
+      //    }
+      //    resizetimer = setTimeout(function() {
+      _setCanvasSize();
+      //    }, 250);
+    });
+
+    _setCanvasSize();
+
+  </script>
+</body>
+
+</html>
