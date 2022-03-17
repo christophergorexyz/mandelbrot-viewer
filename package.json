@@ -5,10 +5,14 @@
   "main": "index.js",
   "scripts": {
     "doc": "jsdoc -r README.md src/ -d docs",
-    "compile": "babel src/ -d lib/ -D -s & (browserify src/index.js -s mandelbrot -d -t [ babelify ] | uglifyjs > dist/mandelbrot-viewer.min.js)",
+    "clean": "rm -rf lib/ dist/ docs/ && mkdir -p dist/ docs/",
+    "precompile": "mkdir -p dist/ docs/ lib/",
+    "compile:dev": "babel src/ -d lib/ -D -s & (browserify --debug src/index.js -s mandelbrot -t [ babelify ] > dist/mandelbrot-viewer.min.js)",
+    "compile": "babel src/ -d lib/ -D -s & (browserify --debug src/index.js -s mandelbrot -t [ babelify ] | uglifyjs -c -m > dist/mandelbrot-viewer.min.js)",
     "build": "npm run doc & npm run compile",
-    "prestart": "npm prune && npm install && npm run build",
-    "start": "http-server -o demo/"
+    "prestart": "npm run clean && npm prune && npm install && npm run build",
+    "start": "http-server -o demo/",
+    "dev": "npm run clean && npm-watch"
   },
   "repository": {
     "type": "git",
@@ -28,18 +32,30 @@
   "devDependencies": {
     "@babel/cli": "^7.17.6",
     "@babel/core": "^7.17.5",
+    "@babel/plugin-transform-runtime": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
+    "@babel/runtime": "^7.17.7",
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
     "eslint": "^8.11.0",
     "eslint-plugin-jsdoc": "^38.0.2",
     "http-server": "^13",
     "jsdoc": "^3.6.10",
+    "npm-watch": "^0.11.0",
     "uglify-js": "^3.15.3"
   },
   "babel": {
     "presets": [
       "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-transform-runtime"
     ]
+  },
+  "watch": {
+    "compile:dev": "src/**/*.js"
+  },
+  "dependencies": {
+    "core-js": "^3.21.1"
   }
 }

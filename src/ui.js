@@ -49,23 +49,49 @@ const FILTERS = {
   none: 'none'
 };
 
+const BUTTON_ZOOM_IN = 'button--zoom-in';
+const BUTTON_ZOOM_OUT = 'button--zoom-out';
+const BUTTON_RESET = 'button--reset';
+const BUTTON_SET_LOCATION = 'button--set-location';
+const INPUT_PALETTE_SEED = 'input--palette-seed';
+const INPUT_PALETTE_MODE = 'input--palette-mode';
+const INPUT_PALETTE_SIZE = 'input--palette-size';
+
+
 function _renderScene(r, viewData) {
   r.render(viewData.scale, viewData.x, viewData.y);
 }
 
-function _renderControls(ui, viewData) {
+function _renderControls(viewData) {
   return `
         <div>
             <a id="get-png" href="#" target="_blank">GET PNG</a>
         </div>
         <div>
-            <button onclick="zoomIn();">+</button>
-            <button onclick="zoomOut();">-</button>
-            <button onclick="reset();">Reset</button>
+            <button id="${BUTTON_ZOOM_IN}">+</button>
+            <button id="${BUTTON_ZOOM_OUT}">-</button>
+            <button id="${BUTTON_RESET}">Reset</button>
         </div>
         <div>
-            <button onclick="save();">Save</button>
+            <button class="button--save">Save</button>
         </div>
+        <hr>
+        <input type="color" id="${INPUT_PALETTE_SEED}" value=${viewData.paletteSeed}>
+        <select id="${INPUT_PALETTE_MODE}">
+          <option>analogic</option>
+          <option>monochrome</option>
+          <option>monochrome-light</option>
+          <option>monochrome-dark</option>
+          <option>complement</option>
+          <option>analogic-complement</option>
+          <option>triad</option>
+          <option>quad</option>
+        </select>
+        <br>
+        <input id="${INPUT_PALETTE_SIZE}" type="number" value="5">
+
+        <hr>
+
         <div id="location">
             <div>
                 <label for="scale">Scale</label>
@@ -79,7 +105,7 @@ function _renderControls(ui, viewData) {
                 <label for="y-location">Y</label>
                 <input id="y-location" type="text" value="${viewData.y}" />
             </div>
-            <button onclick="setLocation();">go</button>
+            <button id="${BUTTON_SET_LOCATION}">go</button>
         </div>
         <div id="saved-list">${viewData.savedLocations.map((l, i)=>{ return  `
                 <div>
@@ -100,8 +126,6 @@ class UI {
     this._r = new Renderer(this._canvas, {
       //coloringMethod: 'default',
       coloringMethod: 'continuous-coloring',
-      //palette: 'material-design-rainbow-a400',
-      palette: 'default',
       //loopPalette: true
     });
 
@@ -112,11 +136,12 @@ class UI {
       canvasWidth: this._canvas.width,
       canvasHeight: this._canvas.height,
       savedLocations: [],
+      paletteSeed:'#000000',
       log: []
     };
 
     this._viewHistory = [this._initViewData];
-    this._viewData = Object.assign({}, this._initViewData);
+    this._viewData = {...this._initViewData};
 
     var savedData = window.localStorage.getItem('locations');
     if (savedData) {
@@ -126,11 +151,12 @@ class UI {
       }
     }
 
+    this.updateInterface();
 
     let ui = this;
     var resizeCanvas = () => {
       if (ui._viewHistory[0].canvasWidth !== ui._canvas.width || ui._viewHistory[0].canvasHeight !== ui._canvas.height) {
-        ui.log(`viewport size changed`);
+        ui.log('viewport size changed');
         ui._viewHistory = [Object.assign({}, ui._viewData)].concat(ui._viewHistory);
         ui._r.updateViewportSize();
         Object.assign(ui._viewData, {
@@ -139,7 +165,6 @@ class UI {
         });
         ui.render();
       }
-      window.requestAnimationFrame(resizeCanvas);
     };
     window.requestAnimationFrame(resizeCanvas);
 
@@ -155,6 +180,38 @@ class UI {
     });
   }
 
+  updateInterface(){
+    this._controls.innerHTML = _renderControls(this._viewData);
+    document.getElementById(BUTTON_ZOOM_IN).addEventListener('click', (...args)=>this.zoomIn(...args));
+    document.getElementById(BUTTON_ZOOM_OUT).addEventListener('click', (...args)=>this.zoomOut(...args));
+    document.getElementById(INPUT_PALETTE_SEED).addEventListener('change',(...args)=>{
+      this._viewData.paletteSeed = this.paletteSeed;
+      this.retrievePalette(...args);
+    });
+    document.getElementById(INPUT_PALETTE_SIZE).addEventListener('change',(...args)=>this.retrievePalette(...args));
+    document.getElementById(INPUT_PALETTE_MODE).addEventListener('change',(...args)=>this.retrievePalette(...args));
+  }
+
+  get paletteSeed (){
+    return document.getElementById(INPUT_PALETTE_SEED).value;
+  }
+
+  get paletteSize (){
+    return document.getElementById(INPUT_PALETTE_SIZE).value;
+  }
+
+  get paletteMode(){
+    return document.getElementById(INPUT_PALETTE_MODE).value;
+  }
+
+  async retrievePalette(){
+    let response = await fetch(`//www.thecolorapi.com/scheme?hex=${this.paletteSeed.slice(1)}&mode=${this.paletteMode}&count=${this.paletteSize}`);
+    let json = await response.json();
+    this._r.palette = json.colors.map(c=>c.rgb);
+
+    _renderScene(this._r, this._viewData);
+  }
+
   zoomIn() {
     this._viewData.scale *= 2;
     this.render();
@@ -166,7 +223,10 @@ class UI {
   }
   render() {
     //_renderControls(this, this._viewData);
+    //bring up something to stop extra rendering
     _renderScene(this._r, this._viewData);
+    this.updateInterface();
+
   }
 
   //log to the UI's console

@@ -1,7 +1,4 @@
-import palette from './palette';
-
 const DEFAULT_SETTINGS = {
-  palette: 'default',
   mandelbrotColor: {
     r: 0,
     g: 0,
@@ -22,7 +19,7 @@ function loopPalette(palette) {
 //with https://en.wikipedia.org/wiki/Mandelbrot_set#Continuous_.28smooth.29_coloring
 function _escapeTime(sample, options) {
   options = Object.assign({}, DEFAULT_SETTINGS, options);
-  let _palette = options.loopPalette ? loopPalette(palette[options.palette]) : palette[options.palette];
+  let _palette = options.loopPalette ? loopPalette(options.palette) : options.palette;
 
   //deafult to black unless we managed to rule this pixel out
   let color = options.mandelbrotColor;
@@ -49,7 +46,7 @@ function _interpolateColor(color1, color2, fraction) {
 function _continuousColoring(sample, options) {
 
   options = Object.assign({}, DEFAULT_SETTINGS, options);
-  var _palette = options.loopPalette ? loopPalette(palette[options.palette]) : palette[options.palette];
+  var _palette = options.loopPalette ? loopPalette(options.palette) : options.palette;
 
   //deafult to black unless we managed to rule this pixel out
   let color = options.mandelbrotColor;

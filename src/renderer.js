@@ -20,10 +20,9 @@ const MIMETYPE_PNG = 'image/png';
 
 const DEFAULT_SETTINGS = {
   coloringMethod: 'default',
-  palette: 'default',
   loopPalette: false,
-  filters: 'none'
-
+  filters: 'none',
+  palette: [{r:0, g:0, b:0}, {r:255, g:255, b:255}],
 };
 
 class Renderer {
@@ -44,6 +43,14 @@ class Renderer {
     this._scale = 1;
     this._dx = HORIZONTAL_OFFSET;
     this._dy = 0;
+  }
+
+  get palette() {
+    return this._options.palette;
+  }
+
+  set palette(val){
+    this._options.palette= val;
   }
 
   get DataUrl() {
@@ -108,10 +115,22 @@ class Renderer {
     this.yStep = (this.yMax - this.yMin) / this._imageData.height;
   }
 
+  sampleCoordinate(x, y){
+    //scale the pixel values to be within the bounds of the set
+    let {
+      r,
+      i
+    } = this.realPositionToComplexPosition(x, y);
+    let sample = this._sampler(0,0,r,i);
+    let color = this._coloringMethod(sample, this._options);
+    this.plot(x, y, color);
+    return sample;
+  }
+
   //scale: how far we've zoomed in from the default
   //dx0: displacement of perspective horizontally
   //dy0: displacement of perspective vertically
-  render(scale, dx0, dy0) {
+  async render(scale, dx0, dy0) {
     this._scale = scale;
 
     this._dx = dx0 - (HORIZONTAL_OFFSET / this._scale);
@@ -121,20 +140,22 @@ class Renderer {
 
     for (var y = 0; y < this._imageData.height; y++) {
       for (var x = 0; x < this._imageData.width; x++) {
-        //scale the pixel values to be within the bounds of the set
-        let {
-          r,
-          i
-        } = this.realPositionToComplexPosition(x, y);
-
-        let sample = this._sampler(0, 0, r, i);
-
-        let color = this._coloringMethod(sample, this._options);
-        this.plot(x, y, color);
+        this.sampleCoordinate(x,y);
       }
     }
 
-    //draw it!
+
+    //TODO: the below is for applying filters to the image
+    // this._context.filter = 'blur(5px)';
+    // let tempCanvas = document.createElement('canvas');
+    // let tempContext = tempCanvas.getContext('2d');
+    // tempCanvas.width = this._canvas.width;
+    // tempCanvas.height = this._canvas.height;
+    // tempContext.putImageData(this._imageData, 0, 0);
+
+    // //draw it!
+    // this._context.drawImage(tempCanvas, 0, 0);
+
     this._context.putImageData(this._imageData, 0, 0);
   }
 
