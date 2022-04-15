@@ -121,10 +121,17 @@ class Renderer {
       r,
       i
     } = this.realPositionToComplexPosition(x, y);
+
+    //TODO: if the coloring method or palette has changed without the coordinates,
+    //zoom, or viewFrame changing, we can simply re-color the samples we already took
     let sample = this._sampler(0,0,r,i);
+
+    return sample;
+  }
+
+  paint(x, y, sample){
     let color = this._coloringMethod(sample, this._options);
     this.plot(x, y, color);
-    return sample;
   }
 
   //scale: how far we've zoomed in from the default
@@ -140,7 +147,8 @@ class Renderer {
 
     for (var y = 0; y < this._imageData.height; y++) {
       for (var x = 0; x < this._imageData.width; x++) {
-        this.sampleCoordinate(x,y);
+        let sample = this.sampleCoordinate(x,y);
+        this.paint(x, y, sample);
       }
     }
 
