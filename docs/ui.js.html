@@ -1,4 +1,32 @@
-import Renderer from './renderer';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ui.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ui.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Renderer from './renderer';
 
 
 const UNIT_PERCENT = '%';
@@ -67,57 +95,57 @@ function _renderScene(r, viewData) {
 
 function _renderControls(viewData) {
   return `
-        <div>
-            <a id="get-png" href="#" target="_blank">GET PNG</a>
-        </div>
-        <div>
-            <button id="${BUTTON_ZOOM_IN}">+</button>
-            <button id="${BUTTON_ZOOM_OUT}">-</button>
-            <button id="${BUTTON_RESET}">Reset</button>
-        </div>
-        <div>
-            <button class="button--save">Save</button>
-        </div>
-        <hr>
-        <input type="color" id="${INPUT_PALETTE_SEED}" value=${viewData.paletteSeed}>
-        <select id="${INPUT_PALETTE_MODE}">
-          <option>analogic</option>
-          <option>monochrome</option>
-          <option>monochrome-light</option>
-          <option>monochrome-dark</option>
-          <option>complement</option>
-          <option>analogic-complement</option>
-          <option>triad</option>
-          <option>quad</option>
-        </select>
-        <br>
-        <input id="${INPUT_PALETTE_SIZE}" type="number" value="5">
+        &lt;div>
+            &lt;a id="get-png" href="#" target="_blank">GET PNG&lt;/a>
+        &lt;/div>
+        &lt;div>
+            &lt;button id="${BUTTON_ZOOM_IN}">+&lt;/button>
+            &lt;button id="${BUTTON_ZOOM_OUT}">-&lt;/button>
+            &lt;button id="${BUTTON_RESET}">Reset&lt;/button>
+        &lt;/div>
+        &lt;div>
+            &lt;button class="button--save">Save&lt;/button>
+        &lt;/div>
+        &lt;hr>
+        &lt;input type="color" id="${INPUT_PALETTE_SEED}" value=${viewData.paletteSeed}>
+        &lt;select id="${INPUT_PALETTE_MODE}">
+          &lt;option>analogic&lt;/option>
+          &lt;option>monochrome&lt;/option>
+          &lt;option>monochrome-light&lt;/option>
+          &lt;option>monochrome-dark&lt;/option>
+          &lt;option>complement&lt;/option>
+          &lt;option>analogic-complement&lt;/option>
+          &lt;option>triad&lt;/option>
+          &lt;option>quad&lt;/option>
+        &lt;/select>
+        &lt;br>
+        &lt;input id="${INPUT_PALETTE_SIZE}" type="number" value="5">
 
-        <hr>
+        &lt;hr>
 
-        <div id="location">
-            <div>
-                <label for="${INPUT_SCALE}">Scale</label>
-                <input id="${INPUT_SCALE}" type="text" value="${viewData.scale}"  />
-            </div>
-            <div>
-                <label for="${INPUT_REAL_COORDINATE}">X</label>
-                <input id="${INPUT_REAL_COORDINATE}" type="text" value="${viewData.x}" />
-            </div>
-            <div>
-                <label for="${INPUT_IMAGINARY_COORDINATE}">Y</label>
-                <input id="${INPUT_IMAGINARY_COORDINATE}" type="text" value="${viewData.y}" />
-            </div>
-            <button id="${BUTTON_SET_LOCATION}">go</button>
-        </div>
-        <div id="saved-list">${viewData.savedLocations.map((l, i)=>{ return  `
-                <div>
-                    <a href="#" class="saved-location" data-location-index="${i}">${l.name}}
-                </div>
-            `;})}</div>
-        <div id="log">
-          ${viewData.log.map((l, i)=>{ return  `<p>${i}: ${l}</p>`;})}
-        </div>
+        &lt;div id="location">
+            &lt;div>
+                &lt;label for="${INPUT_SCALE}">Scale&lt;/label>
+                &lt;input id="${INPUT_SCALE}" type="text" value="${viewData.scale}"  />
+            &lt;/div>
+            &lt;div>
+                &lt;label for="${INPUT_REAL_COORDINATE}">X&lt;/label>
+                &lt;input id="${INPUT_REAL_COORDINATE}" type="text" value="${viewData.x}" />
+            &lt;/div>
+            &lt;div>
+                &lt;label for="${INPUT_IMAGINARY_COORDINATE}">Y&lt;/label>
+                &lt;input id="${INPUT_IMAGINARY_COORDINATE}" type="text" value="${viewData.y}" />
+            &lt;/div>
+            &lt;button id="${BUTTON_SET_LOCATION}">go&lt;/button>
+        &lt;/div>
+        &lt;div id="saved-list">${viewData.savedLocations.map((l, i)=>{ return  `
+                &lt;div>
+                    &lt;a href="#" class="saved-location" data-location-index="${i}">${l.name}}
+                &lt;/div>
+            `;})}&lt;/div>
+        &lt;div id="log">
+          ${viewData.log.map((l, i)=>{ return  `&lt;p>${i}: ${l}&lt;/p>`;})}
+        &lt;/div>
     `;
 }
 
@@ -240,7 +268,7 @@ class UI {
   }
 
   async retrievePalette(){
-    let response = await fetch(`//www.thecolorapi.com/scheme?hex=${this.paletteSeed.slice(1)}&mode=${this.paletteMode}&count=${this.paletteSize}`);
+    let response = await fetch(`//www.thecolorapi.com/scheme?hex=${this.paletteSeed.slice(1)}&amp;mode=${this.paletteMode}&amp;count=${this.paletteSize}`);
     let json = await response.json();
     this._r.palette = json.colors.map(c=>c.rgb);
 
@@ -309,3 +337,26 @@ class UI {
 module.exports = UI;
 
 //TODO: update canvas compositor to a proper ES6 module, and use it for more interactivity
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="UI.html">UI</a></li></ul><h3>Global</h3><ul><li><a href="global.html#julia">julia</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Wed Nov 09 2022 11:17:25 GMT-0500 (Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

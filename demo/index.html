@@ -44,22 +44,23 @@
 
   <script src="../dist/mandelbrot-viewer.min.js" type="text/javascript"></script>
   <script type="text/javascript">
-    var _canvas = document.getElementById('mandelbrot');
-
-    var MandelbrotUI = mandelbrot.UI;
-    var _ui = new MandelbrotUI(_canvas, 'controls');
+    const _canvas = document.getElementById('mandelbrot');
 
     function _setCanvasSize() {
-      _canvas.width = window.innerWidth;
-      _canvas.height = window.innerHeight;
+      _canvas.width = _canvas.parentElement.offsetWidth;
+      _canvas.height = _canvas.parentElement.offsetHeight;
     }
 
+    let params = new URLSearchParams(window.location.search)
+
+    const _ui = new mandelbrot.UI(_canvas, 'controls', params);
+
     window.addEventListener('resize', function (e) {
-      _setCanvasSize(); //TODO: this no longer works
+      _setCanvasSize();
+      _ui.resizeCanvas();
     });
 
     _setCanvasSize();
-
   </script>
 </body>
 

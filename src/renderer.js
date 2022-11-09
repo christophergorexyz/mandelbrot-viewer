@@ -138,6 +138,7 @@ class Renderer {
   //dx0: displacement of perspective horizontally
   //dy0: displacement of perspective vertically
   async render(scale, dx0, dy0) {
+    console.log(`render start ${+new Date}`);
     this._scale = scale;
 
     this._dx = dx0 - (HORIZONTAL_OFFSET / this._scale);
@@ -147,6 +148,9 @@ class Renderer {
 
     for (var y = 0; y < this._imageData.height; y++) {
       for (var x = 0; x < this._imageData.width; x++) {
+        if(x+y%1000===0){
+          console.log(`pass ${x+y} ${+new Date}`);
+        }
         let sample = this.sampleCoordinate(x,y);
         this.paint(x, y, sample);
       }
@@ -165,6 +169,7 @@ class Renderer {
     // this._context.drawImage(tempCanvas, 0, 0);
 
     this._context.putImageData(this._imageData, 0, 0);
+    console.log('render end ', +new Date);
   }
 
   //r= the real part of the number
