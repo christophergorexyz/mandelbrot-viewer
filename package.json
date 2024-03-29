@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:theOutLiar/mandelbrot-viewer.git"
+    "url": "git@github.com:chistophergorexyz/mandelbrot-viewer.git"
   },
   "keywords": [
     "mandelbrot",
@@ -42,6 +42,7 @@
     "http-server": "^13",
     "jsdoc": "^3.6.11",
     "npm-watch": "^0.11.0",
+    "typescript": "^5.2.2",
     "uglify-js": "^3.17.3"
   },
   "babel": {
